@@ -13,6 +13,6 @@ sealed class ConfigValue {
 class DataConfigValue(private val data: String) : ConfigValue() {
 
     override fun asString(): Result<String, ConfigError> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return Result.ok(data)
     }
 }

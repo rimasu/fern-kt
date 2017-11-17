@@ -5,7 +5,12 @@ import com.danneu.result.Result
 /**
  * A configuration scope that be mutated.
  */
-class MutableConfig {
+class MutableConfig(
+        /**
+         * Path of this configuration scope with respect to the root configuration scope
+         */
+        val path: List<String> = mutableListOf()
+) {
 
     private val values = mutableMapOf<String, ConfigValue>()
 
@@ -14,7 +19,7 @@ class MutableConfig {
         return if (value != null) {
             Result.ok(value)
         } else {
-            Result.err(ConfigError(listOf(key)))
+            Result.err(ConfigError( path + key))
         }
     }
 
@@ -22,7 +27,16 @@ class MutableConfig {
         set(key, DataConfigValue(value))
     }
 
+    operator fun set(key: String, value: Int) {
+        set(key, DataConfigValue(value.toString()))
+    }
+
+    operator fun set(key: String, value: MutableConfig) {
+        set(key, NestedConfigValue(value))
+    }
+
     private fun set(key: String, value: ConfigValue) {
+        value.path = this.path + key
         values[key] = value
     }
 }

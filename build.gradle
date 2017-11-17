@@ -1,0 +1,25 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0'
+    }
+}
+
+plugins {
+    id 'com.palantir.git-version' version '0.8.0'
+}
+
+
+apply plugin: "base"
+
+
+ext {
+    gradleDir = "${projectDir}/gradle/common"
+    vcsDetails = versionDetails()
+}
+
+allprojects {
+    version "${vcsDetails.getLastTag()}.${vcsDetails.getCommitDistance()}"
+}

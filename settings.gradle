@@ -1,0 +1,8 @@
+rootProject.name="fuse"
+
+
+include "api"
+include "config"
+include "conformance-test"
+
+

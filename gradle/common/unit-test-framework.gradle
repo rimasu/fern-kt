@@ -1,0 +1,45 @@
+apply plugin: 'org.junit.platform.gradle.plugin'
+apply plugin: 'jacoco'
+
+dependencies {
+    testCompile "org.jetbrains.kotlin:kotlin-reflect:$versionKotlin"
+    testCompile "org.jetbrains.kotlin:kotlin-stdlib-jre8"
+    testCompile "org.jetbrains.kotlin:kotlin-test"
+    testRuntime "org.junit.platform:junit-platform-launcher:1.0.0"
+    testCompile "org.junit.jupiter:junit-jupiter-api:5.0.0"
+    testCompile "org.junit.jupiter:junit-jupiter-params:5.0.0"
+    testRuntime "org.junit.jupiter:junit-jupiter-engine:5.0.0"
+    testCompile "com.winterbe:expekt:0.5.0"
+    testCompile "com.nhaarman:mockito-kotlin:1.2.0"
+    testCompile "nl.jqno.equalsverifier:equalsverifier:2.3.3"
+}
+
+jacoco {
+    toolVersion = "0.7.9"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("${buildDir}/reports/coverage")
+    }
+}
+
+configurations {
+    testAgent {
+        transitive = false
+    }
+}
+
+dependencies {
+    testAgent("org.jacoco:org.jacoco.agent:0.7.9:runtime")
+}
+
+tasks.withType(JavaExec) {
+    if (it.name == 'junitPlatformTest') {
+        doFirst {
+            jvmArgs "-javaagent:${configurations.testAgent.singleFile}=destfile=${project.buildDir.name}/jacoco/test.exec"
+        }
+    }
+}

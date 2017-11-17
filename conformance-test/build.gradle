@@ -1,0 +1,8 @@
+plugins {
+	id "org.jetbrains.kotlin.jvm" version "1.1.60"
+}
+
+apply from: "$gradleDir/kotlin.gradle"
+apply from: "$gradleDir/common-compile-deps.gradle"
+apply from: "$gradleDir/ivy-publish-jar.gradle"
+

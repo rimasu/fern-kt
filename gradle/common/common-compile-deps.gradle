@@ -1,0 +1,8 @@
+repositories {
+    maven { url "https://jitpack.io" } // used for danneu result
+}
+
+dependencies {
+    compile 'com.danneu:kotlin-result:0.0.6'
+    compile "org.slf4j:slf4j-api:1.7.25"
+}

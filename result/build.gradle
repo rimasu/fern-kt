@@ -7,5 +7,5 @@ apply from: "$gradleDir/common-compile-deps.gradle"
 apply from: "$gradleDir/ivy-publish-jar.gradle"
 
 dependencies {
-	compile project(":config")
+	compile "org.jetbrains.kotlin:kotlin-test"
 }

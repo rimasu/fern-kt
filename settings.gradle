@@ -2,6 +2,7 @@ rootProject.name="fuse"
 
 
 include "api"
+include "result"
 include "config"
 include "conformance-test"
 

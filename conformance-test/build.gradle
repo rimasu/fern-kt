@@ -6,3 +6,6 @@ apply from: "$gradleDir/kotlin.gradle"
 apply from: "$gradleDir/common-compile-deps.gradle"
 apply from: "$gradleDir/ivy-publish-jar.gradle"
 
+dependencies {
+	compile project(":api")
+}

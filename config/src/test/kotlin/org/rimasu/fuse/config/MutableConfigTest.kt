@@ -15,6 +15,7 @@ class MutableConfigTest {
         val STRING_VALUE1= "STRING_VALUE1"
         val INTEGER_VALUE1= 67234123
         val NESTED_VALUE1 = MutableConfig()
+        val LIST_VALUE1 : Collection<ConfigValue> = mutableListOf(DataConfigValue(STRING_VALUE1), NestedConfigValue(NESTED_VALUE1))
     }
 
     val config = MutableConfig()
@@ -25,7 +26,7 @@ class MutableConfigTest {
         private val value = config[KEY1]
 
         @Test
-        fun theResultIsError() {
+        fun `then result is error`() {
             assertErr(value) {
                 it.keyPath.should.equal(listOf(KEY1))
             }
@@ -40,7 +41,7 @@ class MutableConfigTest {
         private val value = config[KEY1].flatMap { it.asString() }
 
         @Test
-        fun theResultIsOk() {
+        fun `then result is ok`() {
             assertOk(value) {
                 it.should.equal(STRING_VALUE1)
             }
@@ -55,7 +56,7 @@ class MutableConfigTest {
         private val value = config[KEY1].flatMap { it.asInt() }
 
         @Test
-        fun theResultIsOk() {
+        fun `then result is error`() {
             assertOk(value) {
                 it.should.equal(INTEGER_VALUE1)
             }
@@ -70,7 +71,7 @@ class MutableConfigTest {
         private val value = config[KEY1].flatMap { it.asInt() }
 
         @Test
-        fun theResultIsError() {
+        fun `then result is error`() {
             assertErr(value) {
                 it.keyPath.should.equal(listOf(KEY1))
             }
@@ -85,7 +86,22 @@ class MutableConfigTest {
         private val value = config[KEY1].flatMap { it.asConfig() }
 
         @Test
-        fun theResultIsOk() {
+        fun `then result is error`() {
+            assertErr(value) {
+                it.keyPath.should.equal(listOf(KEY1))
+            }
+        }
+    }
+
+    @Nested
+    inner class `when data value is retrieved as a list` {
+
+        init { config[KEY1] = STRING_VALUE1 }
+
+        private val value = config[KEY1].flatMap { it.asList() }
+
+        @Test
+        fun `then result is error`() {
             assertErr(value) {
                 it.keyPath.should.equal(listOf(KEY1))
             }
@@ -100,7 +116,7 @@ class MutableConfigTest {
         private val value = config[KEY1].flatMap { it.asConfig() }
 
         @Test
-        fun theResultIsOk() {
+        fun `then result is error`() {
             assertOk(value) {
                 it.should.equal(NESTED_VALUE1)
             }
@@ -115,7 +131,7 @@ class MutableConfigTest {
         private val value = config[KEY1].flatMap { it.asString() }
 
         @Test
-        fun theResultIsOk() {
+        fun `then result is error`() {
             assertErr(value) {
                 it.keyPath.should.equal(listOf(KEY1))
             }
@@ -130,9 +146,84 @@ class MutableConfigTest {
         private val value = config[KEY1].flatMap { it.asInt() }
 
         @Test
-        fun theResultIsOk() {
+        fun `then result is error`() {
             assertErr(value) {
                 it.keyPath.should.equal(listOf(KEY1))
+            }
+        }
+    }
+
+    @Nested
+    inner class `when nested value is retrieved as an list` {
+
+        init { config[KEY1] = NESTED_VALUE1 }
+
+        private val value = config[KEY1].flatMap { it.asList() }
+
+        @Test
+        fun `then result is error`() {
+            assertErr(value) {
+                it.keyPath.should.equal(listOf(KEY1))
+            }
+        }
+    }
+
+    @Nested
+    inner class `when list value is retrieved as a string` {
+
+        init { config[KEY1] = LIST_VALUE1 }
+
+        private val value = config[KEY1].flatMap { it.asString() }
+
+        @Test
+        fun `then result is error`() {
+            assertErr(value) {
+                it.keyPath.should.equal(listOf(KEY1))
+            }
+        }
+    }
+
+    @Nested
+    inner class `when list value is retrieved as an int` {
+
+        init { config[KEY1] = LIST_VALUE1 }
+
+        private val value = config[KEY1].flatMap { it.asInt() }
+
+        @Test
+        fun `then result is error`() {
+            assertErr(value) {
+                it.keyPath.should.equal(listOf(KEY1))
+            }
+        }
+    }
+
+    @Nested
+    inner class `when list value is retrieved as an config` {
+
+        init { config[KEY1] = LIST_VALUE1 }
+
+        private val value = config[KEY1].flatMap { it.asConfig() }
+
+        @Test
+        fun `then result is error`() {
+            assertErr(value) {
+                it.keyPath.should.equal(listOf(KEY1))
+            }
+        }
+    }
+
+    @Nested
+    inner class `when list value is retrieved as an list` {
+
+        init { config[KEY1] = LIST_VALUE1 }
+
+        private val value = config[KEY1].flatMap { it.asList() }
+
+        @Test
+        fun `then result is ok`() {
+            assertOk(value) {
+                it.should.equal(LIST_VALUE1)
             }
         }
     }

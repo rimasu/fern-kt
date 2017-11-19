@@ -35,6 +35,10 @@ class MutableConfig(
         set(key, NestedConfigValue(value))
     }
 
+    operator fun set(key: String, value: Iterable<ConfigValue>) {
+        set(key, ListConfigValue(value.toList()))
+    }
+
     private fun set(key: String, value: ConfigValue) {
         value.path = this.path + key
         values[key] = value

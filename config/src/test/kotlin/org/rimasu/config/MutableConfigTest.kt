@@ -1,4 +1,4 @@
-package org.rimasu.fuse.config
+package org.rimasu.config
 
 import com.danneu.result.flatMap
 import com.winterbe.expekt.should
@@ -36,7 +36,8 @@ class MutableConfigTest {
     @Nested
     inner class `when data value is retrieved as a string` {
 
-        init { config[KEY1] = STRING_VALUE1 }
+        init { config[KEY1] = STRING_VALUE1
+        }
 
         private val value = config[KEY1].flatMap { it.asString() }
 
@@ -51,7 +52,8 @@ class MutableConfigTest {
     @Nested
     inner class `when data value is retrieved as an int` {
 
-        init { config[KEY1] = INTEGER_VALUE1 }
+        init { config[KEY1] = INTEGER_VALUE1
+        }
 
         private val value = config[KEY1].flatMap { it.asInt() }
 
@@ -66,7 +68,8 @@ class MutableConfigTest {
     @Nested
     inner class `when data value is retrieved as a badly formatted int` {
 
-        init { config[KEY1] = STRING_VALUE1 }
+        init { config[KEY1] = STRING_VALUE1
+        }
 
         private val value = config[KEY1].flatMap { it.asInt() }
 
@@ -81,7 +84,8 @@ class MutableConfigTest {
     @Nested
     inner class `when data value is retrieved as a config` {
 
-        init { config[KEY1] = STRING_VALUE1 }
+        init { config[KEY1] = STRING_VALUE1
+        }
 
         private val value = config[KEY1].flatMap { it.asConfig() }
 
@@ -96,7 +100,8 @@ class MutableConfigTest {
     @Nested
     inner class `when data value is retrieved as a list` {
 
-        init { config[KEY1] = STRING_VALUE1 }
+        init { config[KEY1] = STRING_VALUE1
+        }
 
         private val value = config[KEY1].flatMap { it.asList() }
 
@@ -111,7 +116,8 @@ class MutableConfigTest {
     @Nested
     inner class `when nested value is retrieved as a config` {
 
-        init { config[KEY1] = NESTED_VALUE1 }
+        init { config[KEY1] = NESTED_VALUE1
+        }
 
         private val value = config[KEY1].flatMap { it.asConfig() }
 
@@ -126,7 +132,8 @@ class MutableConfigTest {
     @Nested
     inner class `when nested value is retrieved as a string` {
 
-        init { config[KEY1] = NESTED_VALUE1 }
+        init { config[KEY1] = NESTED_VALUE1
+        }
 
         private val value = config[KEY1].flatMap { it.asString() }
 
@@ -141,7 +148,8 @@ class MutableConfigTest {
     @Nested
     inner class `when nested value is retrieved as an int` {
 
-        init { config[KEY1] = NESTED_VALUE1 }
+        init { config[KEY1] = NESTED_VALUE1
+        }
 
         private val value = config[KEY1].flatMap { it.asInt() }
 
@@ -156,7 +164,8 @@ class MutableConfigTest {
     @Nested
     inner class `when nested value is retrieved as an list` {
 
-        init { config[KEY1] = NESTED_VALUE1 }
+        init { config[KEY1] = NESTED_VALUE1
+        }
 
         private val value = config[KEY1].flatMap { it.asList() }
 
@@ -171,7 +180,8 @@ class MutableConfigTest {
     @Nested
     inner class `when list value is retrieved as a string` {
 
-        init { config[KEY1] = LIST_VALUE1 }
+        init { config[KEY1] = LIST_VALUE1
+        }
 
         private val value = config[KEY1].flatMap { it.asString() }
 
@@ -186,7 +196,8 @@ class MutableConfigTest {
     @Nested
     inner class `when list value is retrieved as an int` {
 
-        init { config[KEY1] = LIST_VALUE1 }
+        init { config[KEY1] = LIST_VALUE1
+        }
 
         private val value = config[KEY1].flatMap { it.asInt() }
 
@@ -201,7 +212,8 @@ class MutableConfigTest {
     @Nested
     inner class `when list value is retrieved as an config` {
 
-        init { config[KEY1] = LIST_VALUE1 }
+        init { config[KEY1] = LIST_VALUE1
+        }
 
         private val value = config[KEY1].flatMap { it.asConfig() }
 
@@ -216,7 +228,8 @@ class MutableConfigTest {
     @Nested
     inner class `when list value is retrieved as an list` {
 
-        init { config[KEY1] = LIST_VALUE1 }
+        init { config[KEY1] = LIST_VALUE1
+        }
 
         private val value = config[KEY1].flatMap { it.asList() }
 

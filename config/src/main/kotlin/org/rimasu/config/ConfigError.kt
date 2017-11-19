@@ -1,4 +1,4 @@
-package org.rimasu.fuse.config
+package org.rimasu.config
 
 /**
  * A possible error when access a configuration scope.

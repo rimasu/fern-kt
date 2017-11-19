@@ -1,4 +1,4 @@
-package org.rimasu.fuse.config
+package org.rimasu.config
 
 import com.danneu.result.Result
 
@@ -19,7 +19,7 @@ class MutableConfig(
         return if (value != null) {
             Result.ok(value)
         } else {
-            Result.err(ConfigError( path + key))
+            Result.err(ConfigError(path + key))
         }
     }
 

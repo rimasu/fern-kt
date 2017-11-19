@@ -1,4 +1,4 @@
-package org.rimasu.fuse.config
+package org.rimasu.config
 
 import com.danneu.result.Result
 

@@ -29,7 +29,6 @@ class MutableConfigTest {
         fun `then result is error`() {
             assertErr(value) {
                 it.should.be.instanceof(UndefinedValue::class.java)
-                it.keyPath.should.equal(listOf(KEY1))
             }
         }
     }
@@ -78,7 +77,6 @@ class MutableConfigTest {
         fun `then result is error`() {
             assertErr(value) {
                 it.should.be.instanceof(IncompatibleValue::class.java)
-                it.keyPath.should.equal(listOf(KEY1))
             }
         }
     }
@@ -95,7 +93,6 @@ class MutableConfigTest {
         fun `then result is error`() {
             assertErr(value) {
                 it.should.be.instanceof(IncompatibleValue::class.java)
-                it.keyPath.should.equal(listOf(KEY1))
             }
         }
     }
@@ -112,7 +109,6 @@ class MutableConfigTest {
         fun `then result is error`() {
             assertErr(value) {
                 it.should.be.instanceof(IncompatibleValue::class.java)
-                it.keyPath.should.equal(listOf(KEY1))
             }
         }
     }
@@ -145,7 +141,6 @@ class MutableConfigTest {
         fun `then result is error`() {
             assertErr(value) {
                 it.should.be.instanceof(IncompatibleValue::class.java)
-                it.keyPath.should.equal(listOf(KEY1))
             }
         }
     }
@@ -162,7 +157,6 @@ class MutableConfigTest {
         fun `then result is error`() {
             assertErr(value) {
                 it.should.be.instanceof(IncompatibleValue::class.java)
-                it.keyPath.should.equal(listOf(KEY1))
             }
         }
     }
@@ -179,7 +173,6 @@ class MutableConfigTest {
         fun `then result is error`() {
             assertErr(value) {
                 it.should.be.instanceof(IncompatibleValue::class.java)
-                it.keyPath.should.equal(listOf(KEY1))
             }
         }
     }
@@ -196,7 +189,6 @@ class MutableConfigTest {
         fun `then result is error`() {
             assertErr(value) {
                 it.should.be.instanceof(IncompatibleValue::class.java)
-                it.keyPath.should.equal(listOf(KEY1))
             }
         }
     }
@@ -213,7 +205,6 @@ class MutableConfigTest {
         fun `then result is error`() {
             assertErr(value) {
                 it.should.be.instanceof(IncompatibleValue::class.java)
-                it.keyPath.should.equal(listOf(KEY1))
             }
         }
     }
@@ -230,7 +221,6 @@ class MutableConfigTest {
         fun `then result is error`() {
             assertErr(value) {
                 it.should.be.instanceof(IncompatibleValue::class.java)
-                it.keyPath.should.equal(listOf(KEY1))
             }
         }
     }

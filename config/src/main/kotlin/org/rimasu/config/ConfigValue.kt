@@ -31,16 +31,16 @@ class DataConfigValue(private val data: String) : ConfigValue() {
         return if (result != null) {
             Result.ok(result)
         } else {
-            Result.err(ConfigError(path))
+            Result.err(IncompatibleValue(path))
         }
     }
 
     override fun asConfig(): Result<MutableConfig, ConfigError> {
-        return Result.err(ConfigError(path))
+        return Result.err(IncompatibleValue(path))
     }
 
     override fun asList(): Result<List<ConfigValue>, ConfigError> {
-        return Result.err(ConfigError(path))
+        return Result.err(IncompatibleValue(path))
     }
 }
 
@@ -48,11 +48,11 @@ class DataConfigValue(private val data: String) : ConfigValue() {
 class NestedConfigValue(private val data: MutableConfig) : ConfigValue() {
 
     override fun asString(): Result<String, ConfigError> {
-        return Result.err(ConfigError(path))
+        return Result.err(IncompatibleValue(path))
     }
 
     override fun asInt(): Result<Int, ConfigError> {
-        return Result.err(ConfigError(path))
+        return Result.err(IncompatibleValue(path))
     }
 
     override fun asConfig(): Result<MutableConfig, ConfigError> {
@@ -60,7 +60,7 @@ class NestedConfigValue(private val data: MutableConfig) : ConfigValue() {
     }
 
     override fun asList(): Result<List<ConfigValue>, ConfigError> {
-        return Result.err(ConfigError(path))
+        return Result.err(IncompatibleValue(path))
     }
 }
 
@@ -68,15 +68,15 @@ class NestedConfigValue(private val data: MutableConfig) : ConfigValue() {
 class ListConfigValue(private val data: List<ConfigValue>) : ConfigValue() {
 
     override fun asString(): Result<String, ConfigError> {
-        return Result.err(ConfigError(path))
+        return Result.err(IncompatibleValue(path))
     }
 
     override fun asInt(): Result<Int, ConfigError> {
-        return Result.err(ConfigError(path))
+        return Result.err(IncompatibleValue(path))
     }
 
     override fun asConfig(): Result<MutableConfig, ConfigError> {
-        return Result.err(ConfigError(path))
+        return Result.err(IncompatibleValue(path))
     }
 
     override fun asList(): Result<List<ConfigValue>, ConfigError> {

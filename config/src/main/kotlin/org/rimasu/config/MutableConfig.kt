@@ -19,7 +19,7 @@ class MutableConfig(
         return if (value != null) {
             Result.ok(value)
         } else {
-            Result.err(ConfigError(path + key))
+            Result.err(UndefinedValue(path + key))
         }
     }
 

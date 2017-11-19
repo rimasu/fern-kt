@@ -45,28 +45,26 @@ class ConfigValue(private val data: String) : Config() {
             Result.err(IncompatibleValue())
         }
     }
+
+    override fun toString() = data
 }
 
 /**
  * A structured configuration, where values can be addressed by field name.
  */
-class ConfigStruct : Config() {
+class ConfigStruct(values: Map<String, Config>) : Config() {
 
     override fun <T> incompatibleValue() = Result.err(IncompatibleValue())
 
-    private val values = mutableMapOf<String, Config>()
+    private val values = values.toMap()
 
     operator fun get(key: String) : Result<Config, ConfigError> {
         val value = values[key]
         return if (value != null) {
             Result.ok(value)
         } else {
-            Result.err(UndefinedValue())
+            Result.err(UndefinedValue(key))
         }
-    }
-
-    operator fun set(key: String, value: Config) {
-        values[key] = value
     }
 
     override fun asStruct() = Result.ok(this)
@@ -76,32 +74,21 @@ class ConfigStruct : Config() {
 /**
  * A ordered configuration, where values can be addressed by index (starting from one).
  */
-class ConfigList : Iterable<Config>, Config() {
+class ConfigList(configs: List<Config>) : Iterable<Config>, Config() {
 
     override fun <T> incompatibleValue() = Result.err(IncompatibleValue())
 
-    private val values = mutableListOf<Config>()
+    private val values = configs.toList()
 
     operator fun get(index: Int) : Result<Config, ConfigError> {
         return when {
-            index < 1 -> Result.err(UndefinedValue())
-            index > values.size -> Result.err(UndefinedValue())
+            index < 1 -> Result.err(InvalidIndex(index))
+            index > values.size -> Result.err(InvalidIndex(index))
             else -> Result.ok(values[index - 1])
         }
     }
 
     override fun iterator(): Iterator<Config> = values.iterator()
-
-    operator  fun set(key: Int, value: Config) {
-        while(key < values.size) {
-            values.add(NullConfig())
-        }
-        values[key - 1] = value
-    }
-
-    operator fun plusAssign(value: Config) {
-        values.add(value)
-    }
 
     override fun asList() = Result.ok(this)
 }

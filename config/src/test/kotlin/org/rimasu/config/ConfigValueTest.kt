@@ -1,5 +1,6 @@
 package org.rimasu.config
 
+import com.winterbe.expekt.should
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
@@ -13,6 +14,12 @@ class ConfigValueTest {
 
     val INT_CONFIG = STRING_WITH_INTEGER_CONTENT.asConfigValue()
     val STRING_CONFIG = STRING_WITH_NON_INTEGER_CONTENT.asConfigValue()
+
+    @Test
+    fun toStringIsValue() {
+        INT_CONFIG.toString().should.equal(STRING_WITH_INTEGER_CONTENT)
+        STRING_CONFIG.toString().should.equal(STRING_WITH_NON_INTEGER_CONTENT)
+    }
 
     @Nested
     inner class `when getting config value with integer content as string`  : WhenGettingConfigAsString(INT_CONFIG) {

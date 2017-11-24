@@ -1,33 +1,33 @@
-package org.rimasu.config
+package org.rimasu.node
 
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-class NullConfigTest {
+class NullNodeTest {
 
-    val config = NullConfig()
+    val node = NullNode()
 
     @Nested
-    inner class `when getting null config value as string`  : WhenGettingConfigAsString(config) {
+    inner class `when getting null node value as string`  : WhenGettingNodeAsString(node) {
         @Test
         fun `then result is incompatible`() = assertIncompatibleValue()
 
     }
 
     @Nested
-    inner class `when getting null config value as int`  : WhenGettingConfigAsInt(config) {
+    inner class `when getting null node value as int`  : WhenGettingNodeAsInt(node) {
         @Test
         fun `then result is incompatible`() = assertIncompatibleValue()
     }
 
     @Nested
-    inner class `when getting null config value as struct`  : WhenGettingConfigAsStruct(config) {
+    inner class `when getting null node value as struct`  : WhenGettingNodeAsStruct(node) {
         @Test
         fun `then result is incompatible`() = assertIncompatibleValue()
     }
 
     @Nested
-    inner class `when getting null config value as list`  : WhenGettingConfigAsList(config) {
+    inner class `when getting null node value as list`  : WhenGettingNodeAsList(node) {
         @Test
         fun `then result is incompatible`() = assertIncompatibleValue()
     }

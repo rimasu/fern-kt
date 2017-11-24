@@ -1,4 +1,4 @@
-package org.rimasu.config
+package org.rimasu.node
 
 import com.winterbe.expekt.should
 import org.junit.jupiter.api.Nested
@@ -6,15 +6,15 @@ import org.junit.jupiter.api.Test
 import org.rimasu.fuse.result.assertErr
 import org.rimasu.fuse.result.assertOk
 
-class ConfigListTest {
+class ListNodeTest {
 
-    private val A = "a".asConfigValue()
-    private val B = "b".asConfigValue()
-    private val C = "c".asConfigValue()
+    private val A = "a".asNode()
+    private val B = "b".asNode()
+    private val C = "c".asNode()
 
-    private val EMPTY = ConfigList(emptyList())
+    private val EMPTY = ListNode(emptyList())
 
-    private val ABC = ConfigList(listOf(A, B, C))
+    private val ABC = ListNode(listOf(A, B, C))
 
     @Test
     fun canIterateList() {
@@ -23,32 +23,32 @@ class ConfigListTest {
 
 
     @Nested
-    inner class `when getting config list as string`  : WhenGettingConfigAsString(EMPTY) {
+    inner class `when getting list node as string`  : WhenGettingNodeAsString(EMPTY) {
         @Test
         fun `then result is incompatible`() = assertIncompatibleValue()
     }
 
     @Nested
-    inner class `when getting config list as integer`  : WhenGettingConfigAsInt(EMPTY) {
+    inner class `when getting list node as integer`  : WhenGettingNodeAsInt(EMPTY) {
         @Test
         fun `then result is incompatible`() = assertIncompatibleValue()
     }
 
     @Nested
-    inner class `when getting config list as struct`  : WhenGettingConfigAsStruct(EMPTY) {
+    inner class `when getting list node as struct`  : WhenGettingNodeAsStruct(EMPTY) {
         @Test
         fun `then result is incompatible`() = assertIncompatibleValue()
     }
 
     @Nested
-    inner class `when getting config list as list`  : WhenGettingConfigAsList(EMPTY) {
+    inner class `when getting list node as list`  : WhenGettingNodeAsList(EMPTY) {
 
         @Test
         fun `then result is ok`() = assertValueRetrieved(EMPTY)
     }
 
     @Nested
-    inner class `when getting config a index zero` {
+    inner class `when getting node a index zero` {
 
         private val result = ABC[0]
 
@@ -70,7 +70,7 @@ class ConfigListTest {
     }
 
     @Nested
-    inner class `when getting config a index one` {
+    inner class `when getting node a index one` {
 
         private val result = ABC[1]
 
@@ -84,7 +84,7 @@ class ConfigListTest {
 
 
     @Nested
-    inner class `when getting config a index two` {
+    inner class `when getting node a index two` {
 
         private val result = ABC[2]
 
@@ -99,7 +99,7 @@ class ConfigListTest {
 
 
     @Nested
-    inner class `when getting config a index three` {
+    inner class `when getting node a index three` {
 
         private val result = ABC[3]
 
@@ -114,7 +114,7 @@ class ConfigListTest {
 
 
     @Nested
-    inner class `when getting config a index four` {
+    inner class `when getting node a index four` {
 
         private val result = ABC[4]
 

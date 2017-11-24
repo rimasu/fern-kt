@@ -1,4 +1,4 @@
-package org.rimasu.config
+package org.rimasu.node
 
 import com.winterbe.expekt.should
 import org.junit.jupiter.api.Nested
@@ -6,47 +6,47 @@ import org.junit.jupiter.api.Test
 import org.rimasu.fuse.result.assertErr
 import org.rimasu.fuse.result.assertOk
 
-class ConfigStructTest {
+class StructNodeTest {
 
-    private val EMPTY = ConfigStruct(emptyMap())
+    private val EMPTY = StructNode(emptyMap())
 
-    private val A = "a".asConfigValue()
-    private val B = "b".asConfigValue()
-    private val C = "c".asConfigValue()
+    private val A = "a".asNode()
+    private val B = "b".asNode()
+    private val C = "c".asNode()
 
-    private val ABC = ConfigStruct(mapOf(
+    private val ABC = StructNode(mapOf(
             "a" to A,
             "b" to B,
             "c" to C
     ))
 
     @Nested
-    inner class `when getting config struct as string`  : WhenGettingConfigAsString(EMPTY) {
+    inner class `when getting struct node as string`  : WhenGettingNodeAsString(EMPTY) {
         @Test
         fun `then result is incompatible`() = assertIncompatibleValue()
     }
 
     @Nested
-    inner class `when getting config struct as integer`  : WhenGettingConfigAsInt(EMPTY) {
+    inner class `when getting struct node as integer`  : WhenGettingNodeAsInt(EMPTY) {
         @Test
         fun `then result is incompatible`() = assertIncompatibleValue()
     }
 
     @Nested
-    inner class `when getting config struct as struct`  : WhenGettingConfigAsStruct(EMPTY) {
+    inner class `when getting struct node as struct`  : WhenGettingNodeAsStruct(EMPTY) {
         @Test
         fun `then result is ok`() = assertValueRetrieved(EMPTY)
     }
 
     @Nested
-    inner class `when getting config struct as list`  : WhenGettingConfigAsList(EMPTY) {
+    inner class `when getting struct node as list`  : WhenGettingNodeAsList(EMPTY) {
         @Test
         fun `then result is incompatible`() = assertIncompatibleValue()
     }
 
 
     @Nested
-    inner class `when getting config using undefined key` {
+    inner class `when getting node using undefined key` {
 
         private val result = ABC["undefined"]
 
@@ -68,7 +68,7 @@ class ConfigStructTest {
     }
 
     @Nested
-    inner class `when getting config using a defined key` {
+    inner class `when getting node using a defined key` {
 
         private val result = ABC["a"]
 

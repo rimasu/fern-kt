@@ -1,10 +1,10 @@
-package org.rimasu.config
+package org.rimasu.node
 
 import com.winterbe.expekt.should
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-class ConfigValueTest {
+class LeafNodeTest {
 
     companion object {
         private val INTEGER_VALUE = 345234
@@ -12,8 +12,8 @@ class ConfigValueTest {
         private val STRING_WITH_NON_INTEGER_CONTENT = "Some non-integer text"
     }
 
-    val INT_CONFIG = STRING_WITH_INTEGER_CONTENT.asConfigValue()
-    val STRING_CONFIG = STRING_WITH_NON_INTEGER_CONTENT.asConfigValue()
+    val INT_CONFIG = STRING_WITH_INTEGER_CONTENT.asNode()
+    val STRING_CONFIG = STRING_WITH_NON_INTEGER_CONTENT.asNode()
 
     @Test
     fun toStringIsValue() {
@@ -22,38 +22,38 @@ class ConfigValueTest {
     }
 
     @Nested
-    inner class `when getting config value with integer content as string`  : WhenGettingConfigAsString(INT_CONFIG) {
+    inner class `when getting leaf node with integer content as string`  : WhenGettingNodeAsString(INT_CONFIG) {
         @Test
         fun `then result is ok`() = assertValueRetrieved(STRING_WITH_INTEGER_CONTENT)
     }
 
     @Nested
-    inner class `when getting config value with non-integer content as string`  : WhenGettingConfigAsString(STRING_CONFIG) {
+    inner class `when getting leaf node with non-integer content as string`  : WhenGettingNodeAsString(STRING_CONFIG) {
         @Test
         fun `then result is ok`() = assertValueRetrieved(STRING_WITH_NON_INTEGER_CONTENT)
     }
 
     @Nested
-    inner class `when getting config value with integer content as integer`  : WhenGettingConfigAsInt(INTEGER_VALUE.asConfigValue()) {
+    inner class `when getting leaf node with integer content as integer`  : WhenGettingNodeAsInt(INTEGER_VALUE.asNode()) {
         @Test
         fun `then result is ok`() = assertValueRetrieved(INTEGER_VALUE)
     }
 
     @Nested
-    inner class `when getting config value with non-integer content as integer`  : WhenGettingConfigAsInt(STRING_CONFIG) {
+    inner class `when getting leaf node with non-integer content as integer`  : WhenGettingNodeAsInt(STRING_CONFIG) {
         @Test
         fun `then result is incompatible`() = assertIncompatibleValue()
     }
 
 
     @Nested
-    inner class `when getting config value as struct`  : WhenGettingConfigAsStruct(INT_CONFIG) {
+    inner class `when getting leaf node as struct`  : WhenGettingNodeAsStruct(INT_CONFIG) {
         @Test
         fun `then result is incompatible`() = assertIncompatibleValue()
     }
 
     @Nested
-    inner class `when getting config value as list`  : WhenGettingConfigAsList(INT_CONFIG) {
+    inner class `when getting leaf node as list`  : WhenGettingNodeAsList(INT_CONFIG) {
         @Test
         fun `then result is incompatible`() = assertIncompatibleValue()
     }

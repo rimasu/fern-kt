@@ -18,4 +18,5 @@ jar {
 
 license {
     header= file("${rootProjectDir}/LICENSE")
+    strictCheck= true
 }

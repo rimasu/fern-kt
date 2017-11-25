@@ -1,0 +1,38 @@
+# Node, generic structured, weakly typed value exchange stucture.
+
+License: MIT
+
+This library provides a small number of node types that can be composed to represent
+rich configuration and control data.  It provides similar functionality to a
+generic tree made from maps, list and objects, but with the following extra features
+
+1) Every node can construct a 'path' describing its location with respect to
+the root of the structure. The path is composed from a mixture of field labels
+and array indexes so that it is unambiguous even if a data structure is repetative.
+
+2) All leaf data is stored as strings. Data type coercion is done on request when
+leaf data is retrieved by calling code. This preserves the raw leaf data from the source
+right up to the point it is returned to the client. This allows for detailed
+error data if the type coertion cannot be performed. It means that data type differences
+expressed in storage formats like YAML and JSON are ignored (i.e. true is
+equivalent to "true"). The also opens the potential for very simple storage formats later.
+
+3) All access methods return using a result object. This is not ideal for high-volume
+code, as it requires an object creation for each data access.  However for configuration
+and control code it is ideal because when a expected value is missing its precise
+location can be retrieved from results error information
+
+# Basic Types
+
+The basic types are all implemented in the 'types' model.
+
+1) Node: Sealed class that defines the interface for nodes.
+
+2) Null Node: A empty node. This is not modelled as a object, so that it
+can stored its location in the tree of nodes.
+
+3) Leaf Node: Stores small data types. Internally all types are stored as strings
+
+4) List Node: Stores a ordered list of nodes. First node is at index one.
+
+5) Struct Node: Stores a structured set of nodes, identified by labels.

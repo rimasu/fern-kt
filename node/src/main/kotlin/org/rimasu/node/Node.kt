@@ -72,7 +72,7 @@ class LeafNode(private val data: String) : Node() {
 }
 
 /**
- * A structured node, where values can be addressed by field name.
+ * A structured node, where values can be addressed by labellabels.
  */
 class StructNode(values: Map<String, Node>) : Node() {
 

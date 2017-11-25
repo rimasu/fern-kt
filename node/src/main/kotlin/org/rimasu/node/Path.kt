@@ -1,3 +1,12 @@
 package org.rimasu.node
 
-data class Path(val steps: List<Step>)
+/**
+ * A path from a node (normally the root) to another node.
+ */
+data class Path(val steps: List<Step>) {
+    override fun toString() = steps.joinToString (
+            prefix = "{",
+            postfix = "}",
+            separator = ""
+    )
+}

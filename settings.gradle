@@ -1,9 +1,5 @@
 rootProject.name="fuse"
 
-
-include "api"
-include "result"
-include "node"
-include "conformance-test"
+include "types"
 
 

@@ -37,4 +37,23 @@ class PathTest {
             path.toString().should.equal("{/a/b#3#100/c#7}")
         }
     }
+
+    @Nested
+    inner class `when step added to path` {
+
+        private val stepA = LabelStep("a")
+        private val initial = Path(listOf(stepA))
+        private val next = LabelStep("b")
+        private val combined = initial + next
+
+        @Test
+        fun `then combined contains all steps`() {
+            combined.should.equal(Path(listOf(stepA, next)))
+        }
+
+        @Test
+        fun `then initial path is unchanged`() {
+            initial.should.equal(Path(listOf(stepA)))
+        }
+    }
 }

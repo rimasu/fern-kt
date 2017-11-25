@@ -1,4 +1,4 @@
-rootProject.name="fuse"
+rootProject.name="node"
 
 include "types"
 

@@ -5,22 +5,16 @@ package org.rimasu.node
  */
 sealed class NodeError
 {
+    abstract val path: Path
 }
 
 /**
- * Error returned when a undefined key is accessed.
+ * Error returned when a undefined label is accessed.
  */
-data class UndefinedValue(val key: String) : NodeError()
+data class UndefinedValue(override val path: Path) : NodeError()
 
 
 /**
  * Error returned when a value could not be coerced into the requested type.
  */
-class IncompatibleValue : NodeError()
-
-
-/**
- * Error returned when a accessing a value in a list with an index outside the range. The first item
- * in a list is value 1, not value 0.
- */
-data class InvalidIndex(val index: Int): NodeError()
+class IncompatibleValue(override val path: Path) : NodeError()

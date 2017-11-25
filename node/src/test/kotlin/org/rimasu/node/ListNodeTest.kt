@@ -55,17 +55,17 @@ class ListNodeTest : NodeTest() {
         private val result = ABC[0]
 
         @Test
-        fun `then result is invalid index`() {
+        fun `then result is undefined value`() {
             assertErr(result) {
-                it.should.be.instanceof(InvalidIndex::class.java)
+                it.should.be.instanceof(UndefinedValue::class.java)
             }
         }
 
         @Test
         fun `then result recorded index is zero`() {
             assertErr(result) {
-                if (it is InvalidIndex) {
-                    it.index.should.equal(0)
+                if (it is UndefinedValue) {
+                    it.path.should.equal(Path(listOf(IndexStep(0))))
                 }
             }
         }
@@ -121,17 +121,17 @@ class ListNodeTest : NodeTest() {
         private val result = ABC[4]
 
         @Test
-        fun `then result is invalid index`() {
+        fun `then result is undefined value`() {
             assertErr(result) {
-                it.should.be.instanceof(InvalidIndex::class.java)
+                it.should.be.instanceof(UndefinedValue::class.java)
             }
         }
 
         @Test
         fun `then result recorded index is four`() {
             assertErr(result) {
-                if (it is InvalidIndex) {
-                    it.index.should.equal(4)
+                if (it is UndefinedValue) {
+                    it.path.should.equal(Path(listOf(IndexStep(4))))
                 }
             }
         }

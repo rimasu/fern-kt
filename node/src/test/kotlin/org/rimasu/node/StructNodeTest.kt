@@ -48,7 +48,7 @@ class StructNodeTest : NodeTest() {
 
 
     @Nested
-    inner class `when getting node using undefined key` {
+    inner class `when getting node using undefined label` {
 
         private val result = ABC["undefined"]
 
@@ -60,17 +60,17 @@ class StructNodeTest : NodeTest() {
         }
 
         @Test
-        fun `then result recorded key key`() {
+        fun `then result recorded path`() {
             assertErr(result) {
                 if (it is UndefinedValue) {
-                    it.key.should.equal("undefined")
+                    it.path.should.equal(Path(listOf(LabelStep("undefined"))))
                 }
             }
         }
     }
 
     @Nested
-    inner class `when getting node using a defined key` {
+    inner class `when getting node using a defined label` {
 
         private val result = ABC["a"]
 

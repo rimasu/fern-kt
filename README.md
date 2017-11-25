@@ -4,16 +4,16 @@ License: MIT
 
 This library provides a small number of node types that can be composed to represent
 rich configuration and control data.  It provides similar functionality to a
-generic tree made from maps, list and objects, but with the following extra features
+generic tree made from maps, list and objects, but with the following extra features:
 
 1) Every node can construct a 'path' describing its location with respect to
 the root of the structure. The path is composed from a mixture of field labels
-and array indexes so that it is unambiguous even if a data structure is repetative.
+and array indexes so that it is unambiguous even if a data structure is repetitive.
 
 2) All leaf data is stored as strings. Data type coercion is done on request when
 leaf data is retrieved by calling code. This preserves the raw leaf data from the source
 right up to the point it is returned to the client. This allows for detailed
-error data if the type coertion cannot be performed. It means that data type differences
+error data if the type coercion cannot be performed. It means that data type differences
 expressed in storage formats like YAML and JSON are ignored (i.e. true is
 equivalent to "true"). The also opens the potential for very simple storage formats later.
 
@@ -24,7 +24,7 @@ location can be retrieved from results error information
 
 # Basic Types
 
-The basic types are all implemented in the 'types' model.
+The basic types are all implemented in the 'types' sub-model.
 
 1) Node: Sealed class that defines the interface for nodes.
 

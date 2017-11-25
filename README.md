@@ -1,5 +1,7 @@
 # Node, generic structured, weakly typed value exchange stucture.
 
+[![Build Status](https://travis-ci.org/rimasu/node.png?branch=master)](https://travis-ci.org/rimasu/node)
+
 License: MIT
 
 This library provides a small number of node types that can be composed to represent

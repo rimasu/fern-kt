@@ -5,6 +5,7 @@ plugins {
 apply from: "$gradleDir/kotlin.gradle"
 apply from: "$gradleDir/common-compile-deps.gradle"
 apply from: "$gradleDir/ivy-publish-jar.gradle"
+apply from: "$gradleDir/maven-publish-jar.gradle"
 
 dependencies {
 	compile "com.github.michaelbull:kotlin-result:$versionResult"

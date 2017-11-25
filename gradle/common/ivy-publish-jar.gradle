@@ -1,7 +1,5 @@
 apply plugin: 'ivy-publish'
 
-
-
 publishing {
     repositories {
         ivy {

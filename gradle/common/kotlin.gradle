@@ -1,6 +1,7 @@
 
 
 apply plugin: "kotlin"
+apply plugin: "com.github.hierynomus.license"
 
 apply from: "$gradleDir/common-repos.gradle"
 apply from: "$gradleDir/unit-test-framework.gradle"
@@ -12,4 +13,9 @@ dependencies {
 
 jar {
 	baseName = "${rootProject.name}-${project.name}"
+}
+
+
+license {
+    header= file("${rootProjectDir}/LICENSE")
 }

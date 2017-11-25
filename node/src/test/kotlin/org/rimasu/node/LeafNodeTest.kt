@@ -4,7 +4,7 @@ import com.winterbe.expekt.should
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-class LeafNodeTest {
+class LeafNodeTest : NodeTest() {
 
     companion object {
         private val INTEGER_VALUE = 345234
@@ -12,23 +12,25 @@ class LeafNodeTest {
         private val STRING_WITH_NON_INTEGER_CONTENT = "Some non-integer text"
     }
 
-    val INT_CONFIG = STRING_WITH_INTEGER_CONTENT.asNode()
-    val STRING_CONFIG = STRING_WITH_NON_INTEGER_CONTENT.asNode()
+    val INT_NODE = STRING_WITH_INTEGER_CONTENT.asNode()
+    val STRING_NODE = STRING_WITH_NON_INTEGER_CONTENT.asNode()
+
+    override val node = INT_NODE
 
     @Test
     fun toStringIsValue() {
-        INT_CONFIG.toString().should.equal(STRING_WITH_INTEGER_CONTENT)
-        STRING_CONFIG.toString().should.equal(STRING_WITH_NON_INTEGER_CONTENT)
+        INT_NODE.toString().should.equal(STRING_WITH_INTEGER_CONTENT)
+        STRING_NODE.toString().should.equal(STRING_WITH_NON_INTEGER_CONTENT)
     }
 
     @Nested
-    inner class `when getting leaf node with integer content as string`  : WhenGettingNodeAsString(INT_CONFIG) {
+    inner class `when getting leaf node with integer content as string`  : WhenGettingNodeAsString(INT_NODE) {
         @Test
         fun `then result is ok`() = assertValueRetrieved(STRING_WITH_INTEGER_CONTENT)
     }
 
     @Nested
-    inner class `when getting leaf node with non-integer content as string`  : WhenGettingNodeAsString(STRING_CONFIG) {
+    inner class `when getting leaf node with non-integer content as string`  : WhenGettingNodeAsString(STRING_NODE) {
         @Test
         fun `then result is ok`() = assertValueRetrieved(STRING_WITH_NON_INTEGER_CONTENT)
     }
@@ -40,20 +42,20 @@ class LeafNodeTest {
     }
 
     @Nested
-    inner class `when getting leaf node with non-integer content as integer`  : WhenGettingNodeAsInt(STRING_CONFIG) {
+    inner class `when getting leaf node with non-integer content as integer`  : WhenGettingNodeAsInt(STRING_NODE) {
         @Test
         fun `then result is incompatible`() = assertIncompatibleValue()
     }
 
 
     @Nested
-    inner class `when getting leaf node as struct`  : WhenGettingNodeAsStruct(INT_CONFIG) {
+    inner class `when getting leaf node as struct`  : WhenGettingNodeAsStruct(INT_NODE) {
         @Test
         fun `then result is incompatible`() = assertIncompatibleValue()
     }
 
     @Nested
-    inner class `when getting leaf node as list`  : WhenGettingNodeAsList(INT_CONFIG) {
+    inner class `when getting leaf node as list`  : WhenGettingNodeAsList(INT_NODE) {
         @Test
         fun `then result is incompatible`() = assertIncompatibleValue()
     }

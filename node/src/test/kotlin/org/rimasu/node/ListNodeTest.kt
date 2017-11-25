@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.rimasu.fuse.result.assertErr
 import org.rimasu.fuse.result.assertOk
 
-class ListNodeTest {
+class ListNodeTest : NodeTest() {
 
     private val A = "a".asNode()
     private val B = "b".asNode()
@@ -16,8 +16,10 @@ class ListNodeTest {
 
     private val ABC = ListNode(listOf(A, B, C))
 
+    override val node = EMPTY
+
     @Test
-    fun canIterateList() {
+    fun `can iterate list`() {
         ABC.toList().should.equal(listOf(A, B, C))
     }
 

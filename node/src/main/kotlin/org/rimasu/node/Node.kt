@@ -5,6 +5,9 @@ import com.danneu.result.Result
 /** A piece of node */
 sealed class Node {
 
+    private var parent: Node? = null
+    private var usage: Step? = null
+
     /** Get the value as a string. Will return an error if the value can not be coerced into a string. */
     open fun asString(): Result<String, NodeError> = incompatibleValue()
 
@@ -18,6 +21,25 @@ sealed class Node {
     open fun asList(): Result<ListNode, NodeError> = incompatibleValue()
 
     abstract fun <T> incompatibleValue() : Result<T, NodeError>
+
+    /** path from root configuration to this node. Calculated because this value will change is current
+     * root is added to another container. */
+    val path: Path get() {
+        val steps = mutableListOf<Step>()
+        populate(steps)
+        return Path(steps)
+    }
+
+    private fun populate(steps: MutableList<Step>) {
+        parent?.populate(steps)
+        usage?.let{ steps.add(it) }
+    }
+
+    internal fun setParent(parent: Node, usage: Step) {
+        require(this.parent == null)
+        this.parent = parent
+        this.usage = usage
+    }
 }
 
 fun String.asNode() = LeafNode(this)
@@ -54,6 +76,8 @@ class LeafNode(private val data: String) : Node() {
  */
 class StructNode(values: Map<String, Node>) : Node() {
 
+    init { values.forEach { (label, value) -> value.setParent(this, LabelStep(label)) } }
+
     override fun <T> incompatibleValue() = Result.err(IncompatibleValue())
 
     private val values = values.toMap()
@@ -75,6 +99,8 @@ class StructNode(values: Map<String, Node>) : Node() {
  * A ordered node, where values can be addressed by index (starting from one).
  */
 class ListNode(nodes: List<Node>) : Iterable<Node>, Node() {
+
+    init { nodes.forEachIndexed { index, node -> node.setParent(this, IndexStep(index + 1)) } }
 
     override fun <T> incompatibleValue() = Result.err(IncompatibleValue())
 

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.rimasu.fuse.result.assertErr
 import org.rimasu.fuse.result.assertOk
 
-class StructNodeTest {
+class StructNodeTest : NodeTest() {
 
     private val EMPTY = StructNode(emptyMap())
 
@@ -19,6 +19,8 @@ class StructNodeTest {
             "b" to B,
             "c" to C
     ))
+
+    override val node = EMPTY
 
     @Nested
     inner class `when getting struct node as string`  : WhenGettingNodeAsString(EMPTY) {

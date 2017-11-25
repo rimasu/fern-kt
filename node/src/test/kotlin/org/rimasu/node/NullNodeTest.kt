@@ -3,9 +3,9 @@ package org.rimasu.node
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-class NullNodeTest {
+class NullNodeTest : NodeTest() {
 
-    val node = NullNode()
+    override val node = NullNode()
 
     @Nested
     inner class `when getting null node value as string`  : WhenGettingNodeAsString(node) {

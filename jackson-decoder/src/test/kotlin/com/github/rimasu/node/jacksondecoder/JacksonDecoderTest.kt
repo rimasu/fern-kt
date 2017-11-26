@@ -20,8 +20,10 @@
  */
 package com.github.rimasu.node.jacksondecoder
 
+import com.github.rimasu.node.types.ListNode
 import com.github.rimasu.node.types.Node
 import com.github.rimasu.node.types.StructNode
+import com.github.rimasu.node.types.asNode
 import com.winterbe.expekt.should
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -35,6 +37,55 @@ class JacksonDecoderTest {
             expectedNode = StructNode(emptyMap())
     )
 
+    @Nested
+    inner class `when json text is empty array` : SuccessfulParse(
+            jsonText = """[]""",
+            expectedNode = ListNode(emptyList())
+    )
+
+    @Nested
+    inner class `when json text is populated array` : SuccessfulParse(
+            jsonText = """["a",1,[],{}]""",
+            expectedNode = ListNode(
+                    listOf(
+                        "a".asNode(),
+                        1.asNode(),
+                        ListNode(emptyList()),
+                        StructNode(emptyMap())
+                    )
+            )
+    )
+
+    @Nested
+    inner class `when json text is populated struct` : SuccessfulParse(
+            jsonText = """{"a":"a","b":1,"c":[],"d":{}}""",
+            expectedNode = StructNode(
+                    mapOf(
+                            "a" to "a".asNode(),
+                            "b" to 1.asNode(),
+                            "c" to ListNode(emptyList()),
+                            "d" to StructNode(emptyMap())
+                    )
+            )
+    )
+
+    @Nested
+    inner class `when json text is empty string` : SuccessfulParse(
+            jsonText = "\"\"",
+            expectedNode = "".asNode()
+    )
+
+    @Nested
+    inner class `when json text is populated string` : SuccessfulParse(
+            jsonText = "\"a\"",
+            expectedNode = "a".asNode()
+    )
+
+    @Nested
+    inner class `when json text is integer` : SuccessfulParse(
+            jsonText = "456",
+            expectedNode = 456.asNode()
+    )
 
     open inner class SuccessfulParse(
             jsonText: String,

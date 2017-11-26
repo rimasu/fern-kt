@@ -20,12 +20,32 @@
  */
 package com.github.rimasu.node.types
 
+import com.winterbe.expekt.should
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class NullNodeTest : NodeTest() {
 
     override val node = NullNode()
+
+    @Test
+    fun `to string contains equals _`() {
+        NullNode().toString().should.equal("_")
+    }
+
+    @Test
+    fun `null nodes are equal`() {
+        val first = NullNode()
+        val second = NullNode()
+        first.should.equal(second)
+    }
+
+    @Test
+    fun `null nodes have same hash code`() {
+        val first = NullNode().hashCode()
+        val second = NullNode().hashCode()
+        first.should.equal(second)
+    }
 
     @Nested
     inner class `when getting null node value as string`  : WhenGettingNodeAsString(node) {

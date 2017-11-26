@@ -59,7 +59,7 @@ sealed class Node {
     }
 
     internal fun setParent(parent: Node, usage: Step) {
-        require(this.parent == null)
+        require(this.parent == null) { "Node can not be added to parent, as it already had a parent" }
         this.parent = parent
         this.usage = usage
     }
@@ -71,10 +71,20 @@ fun Int.asNode() = LeafNode(this.toString())
 
 class NullNode : Node() {
     override fun <T> incompatibleValue(path: Path) = Err(IncompatibleValue(path))
+
+    override fun toString() = "_"
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return true
+    }
+
+    override fun hashCode() = javaClass.hashCode()
 }
 
 /** A node value that stores a simple value (serialized as a string). */
-class LeafNode(private val data: String) : Node() {
+data class LeafNode(private val data: String) : Node() {
 
     override fun <T> incompatibleValue(path: Path) = Err(IncompatibleValue(path))
 
@@ -115,6 +125,27 @@ class StructNode(values: Map<String, Node>) : Node() {
     }
 
     override fun asStruct() = Ok(this)
+
+    override fun toString(): String {
+        return values
+                .map {"${it.key}=${it.value}"}
+                .joinToString (
+                prefix = "{",
+                postfix = "}",
+                separator = " "
+        )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as StructNode
+
+        return values == other.values
+    }
+
+    override fun hashCode() = values.hashCode()
 }
 
 
@@ -140,4 +171,24 @@ class ListNode(nodes: List<Node>) : Iterable<Node>, Node() {
     override fun iterator(): Iterator<Node> = values.iterator()
 
     override fun asList() = Ok(this)
+
+    override fun toString(): String {
+        return values.joinToString (
+                prefix = "[",
+                postfix = "]",
+                separator = " "
+        )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ListNode
+
+        return values ==  other.values
+    }
+
+    override fun hashCode() = values.hashCode()
+
 }

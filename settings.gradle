@@ -1,5 +1,6 @@
 rootProject.name="node"
 
 include "types"
+include "jackson-decoder"
 
 

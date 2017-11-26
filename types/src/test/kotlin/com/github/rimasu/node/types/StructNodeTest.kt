@@ -40,6 +40,40 @@ class StructNodeTest : NodeTest() {
 
     override val node = EMPTY
 
+    @Test
+    fun `to string contains members`() {
+        ABC.toString().should.equal("{a=a b=b c=c}")
+    }
+
+    @Test
+    fun `struct nodes with same content are equal`() {
+        val first = StructNode(mapOf("a" to "a".asNode()))
+        val second = StructNode(mapOf("a" to "a".asNode()))
+        first.should.equal(second)
+    }
+
+
+    @Test
+    fun `struct nodes with same content have same hash code`() {
+        val first = StructNode(mapOf("a" to "a".asNode())).hashCode()
+        val second = StructNode(mapOf("a" to "a".asNode())).hashCode()
+        first.should.equal(second)
+    }
+
+    @Test
+    fun `struct nodes with different content are not equal`() {
+        val first = StructNode(mapOf("a" to "b".asNode()))
+        val second = StructNode(mapOf("a" to "a".asNode()))
+        first.should.not.equal(second)
+    }
+
+    @Test
+    fun `struct nodes with different content have different hash codes`() {
+        val first = StructNode(mapOf("a" to "b".asNode())).hashCode()
+        val second = StructNode(mapOf("a" to "a".asNode())).hashCode()
+        first.should.not.equal(second)
+    }
+
     @Nested
     inner class `when getting struct node as string`  : WhenGettingNodeAsString(EMPTY) {
         @Test

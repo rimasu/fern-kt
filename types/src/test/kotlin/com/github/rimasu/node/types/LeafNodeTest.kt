@@ -38,6 +38,20 @@ class LeafNodeTest : NodeTest() {
     override val node = INT_NODE
 
     @Test
+    fun `leaf node with same string content are equal`() {
+        val first = INTEGER_VALUE.asNode()
+        val second = INTEGER_VALUE.toString().asNode()
+        first.should.equal(second)
+    }
+
+    @Test
+    fun `leaf nodes with different string content are not equal`() {
+        val first = "a".asNode()
+        val second = "b".asNode()
+        first.should.not.equal(second)
+    }
+
+    @Test
     fun toStringIsValue() {
         INT_NODE.toString().should.equal(STRING_WITH_INTEGER_CONTENT)
         STRING_NODE.toString().should.equal(STRING_WITH_NON_INTEGER_CONTENT)

@@ -41,6 +41,38 @@ class ListNodeTest : NodeTest() {
         ABC.toList().should.equal(listOf(A, B, C))
     }
 
+    @Test
+    fun `to string contains members`() {
+        ABC.toString().should.equal("[a b c]")
+    }
+
+    @Test
+    fun `list nodes with same content are equal`() {
+        val first = ListNode(listOf("a".asNode()))
+        val second = ListNode(listOf("a".asNode()))
+        first.should.equal(second)
+    }
+
+    @Test
+    fun `list nodes with same content have same hash code`() {
+        val first = ListNode(listOf("a".asNode())).hashCode()
+        val second = ListNode(listOf("a".asNode())).hashCode()
+        first.should.equal(second)
+    }
+
+    @Test
+    fun `list nodes with different content are not equal`() {
+        val first = ListNode(listOf("a".asNode()))
+        val second = ListNode(listOf("b".asNode()))
+        first.should.not.equal(second)
+    }
+
+    @Test
+    fun `list nodes with different content are not have different hash codes`() {
+        val first = ListNode(listOf("a".asNode())).hashCode()
+        val second = ListNode(listOf("b".asNode())).hashCode()
+        first.should.not.equal(second)
+    }
 
     @Nested
     inner class `when getting list node as string`  : WhenGettingNodeAsString(EMPTY) {

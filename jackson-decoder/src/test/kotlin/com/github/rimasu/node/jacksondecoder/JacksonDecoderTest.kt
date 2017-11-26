@@ -20,8 +20,11 @@
  */
 package com.github.rimasu.node.jacksondecoder
 
+import com.github.rimasu.node.types.Node
 import com.github.rimasu.node.types.StructNode
+import com.winterbe.expekt.should
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 
 
 class JacksonDecoderTest {
@@ -31,5 +34,22 @@ class JacksonDecoderTest {
             jsonText = """{}""",
             expectedNode = StructNode(emptyMap())
     )
+
+
+    open inner class SuccessfulParse(
+            jsonText: String,
+            private val expectedNode: Node
+    )
+    {
+        private val decoder = JacksonDecoder()
+        private val result = decoder.decode(jsonText)
+
+        @Test
+        fun `then parse was successful`() {
+            assertOk(result) {
+                it.should.equal(expectedNode)
+            }
+        }
+    }
 }
 

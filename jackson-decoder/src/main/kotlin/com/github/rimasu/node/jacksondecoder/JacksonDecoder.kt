@@ -23,13 +23,11 @@ package com.github.rimasu.node.jacksondecoder
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonToken
+import com.fasterxml.jackson.core.io.JsonEOFException
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import com.github.rimasu.node.types.ListNode
-import com.github.rimasu.node.types.Node
-import com.github.rimasu.node.types.StructNode
-import com.github.rimasu.node.types.asNode
+import com.github.rimasu.node.types.*
 
 /**
  * Responsible for decoding a node structure from a json document.
@@ -37,24 +35,37 @@ import com.github.rimasu.node.types.asNode
 class JacksonDecoder(private val jsonFactory: JsonFactory = JsonFactory()) {
 
     /**
+     * Decode document from json encoded as string.
+     */
+    fun decode(jsonText: String): Result<Node, ParseError> {
+        return decode(jsonFactory.createParser(jsonText))
+    }
+
+    /**
      * Decode document from existing parser. Most useful if node structure
      * has been embedded in a json document.
      */
-    fun decode(parser: JsonParser) : Result<Node, ParseError> {
+    fun decode(parser: JsonParser): Result<Node, ParseError> {
         parser.nextToken()
-        return decodeNode( parser)
+        return decodeNode(parser)
     }
 
     /**
      * Decode the current current token as a node.
      */
     private fun decodeNode(parser: JsonParser): Result<Node, ParseError> {
+        val startLine = parser.currentLocation.lineNr
+        val startPos = parser.currentLocation.columnNr
         return when (parser.currentToken) {
             JsonToken.START_OBJECT -> decodeStruct(parser)
             JsonToken.START_ARRAY -> decodeList(parser)
             JsonToken.VALUE_STRING -> Ok(parser.valueAsString.asNode())
-            JsonToken.VALUE_NUMBER_INT -> Ok(parser.valueAsInt.asNode())
-            else -> Err(ParseError())
+            JsonToken.VALUE_NUMBER_INT -> Ok(parser.valueAsLong.asNode())
+            JsonToken.VALUE_NUMBER_FLOAT -> Ok(parser.valueAsDouble.asNode())
+            JsonToken.VALUE_TRUE -> Ok(true.asNode())
+            JsonToken.VALUE_FALSE -> Ok(false.asNode())
+            JsonToken.VALUE_NULL -> Ok(NullNode())
+            else -> return Err(ParseError(buildAnchor(parser, startLine, startPos)))
         }
     }
 
@@ -62,42 +73,57 @@ class JacksonDecoder(private val jsonFactory: JsonFactory = JsonFactory()) {
      * Start of struct has been encountered. Need to parse fields (if any) and then end object.
      */
     private fun decodeStruct(parser: JsonParser): Result<Node, ParseError> {
-        val parts = mutableMapOf<String, Node>()
-        while(parser.nextToken() != JsonToken.END_OBJECT) {
-            if (parser.currentToken == JsonToken.FIELD_NAME) {
+        val startLine = parser.currentLocation.lineNr
+        val startPos = parser.currentLocation.columnNr
+        try {
+            val parts = mutableMapOf<String, Node>()
+            while (parser.nextToken() == JsonToken.FIELD_NAME) {
                 val label = parser.currentName
                 val nodeResult = decode(parser)
-                when(nodeResult) {
+                when (nodeResult) {
                     is Ok -> parts[label] = nodeResult.value
                     is Err -> return nodeResult
                 }
-            } else {
-                return Err(ParseError())
             }
+
+            return if (parser.currentToken == JsonToken.END_OBJECT) {
+                Ok(StructNode(parts))
+            } else {
+                Err(ParseError(buildAnchor(parser, startLine, startPos)))
+            }
+        } catch (e: JsonEOFException) {
+            return Err(ParseError(buildAnchor(parser, startLine, startPos)))
         }
-        return Ok(StructNode(parts))
+    }
+
+    private fun buildAnchor(parser: JsonParser, startLine: Int, startPos: Int): Anchor {
+        return Anchor(
+                startLine,
+                Math.max(1, startPos),
+                parser.currentLocation.lineNr,
+                Math.max(1, parser.currentLocation.columnNr-1)
+        )
     }
 
     /**
-     * Start of struct has been encountered. Need to parse values (if any) and then end object.
+     * Start of list has been encountered. Need to parse values (if any) and then end array.
      */
     private fun decodeList(parser: JsonParser): Result<Node, ParseError> {
+        val startLine = parser.currentLocation.lineNr
+        val startPos = parser.currentLocation.columnNr
         val parts = mutableListOf<Node>()
-        while(parser.nextToken() != JsonToken.END_ARRAY) {
-            val nodeResult = decodeNode(parser)
-            when(nodeResult) {
-                is Ok -> parts.add(nodeResult.value)
-                is Err -> return nodeResult
+        try {
+            while (parser.nextToken() != JsonToken.END_ARRAY) {
+                val nodeResult = decodeNode(parser)
+                when (nodeResult) {
+                    is Ok -> parts.add(nodeResult.value)
+                    is Err -> return nodeResult
+                }
             }
+            return Ok(ListNode(parts, buildAnchor(parser, startLine, startPos)))
+        } catch (e: JsonEOFException) {
+            return Err(ParseError(buildAnchor(parser, startLine, startPos)))
         }
-        return Ok(ListNode(parts))
-    }
-
-    /**
-     * Decode document from json encoded as string.
-     */
-    fun decode(jsonText: String) : Result<Node, ParseError> {
-        return decode(jsonFactory.createParser(jsonText))
     }
 }
 

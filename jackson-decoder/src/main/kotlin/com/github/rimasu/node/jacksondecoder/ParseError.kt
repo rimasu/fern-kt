@@ -20,6 +20,10 @@
  */
 package com.github.rimasu.node.jacksondecoder
 
-class ParseError {
+import com.github.rimasu.node.types.Anchor
+
+data class ParseError(
+        val anchor: Anchor
+) {
 
 }

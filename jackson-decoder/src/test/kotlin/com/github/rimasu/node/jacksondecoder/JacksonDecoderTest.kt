@@ -20,10 +20,7 @@
  */
 package com.github.rimasu.node.jacksondecoder
 
-import com.github.rimasu.node.types.ListNode
-import com.github.rimasu.node.types.Node
-import com.github.rimasu.node.types.StructNode
-import com.github.rimasu.node.types.asNode
+import com.github.rimasu.node.types.*
 import com.winterbe.expekt.should
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -87,6 +84,46 @@ class JacksonDecoderTest {
             expectedNode = 456.asNode()
     )
 
+    @Nested
+    inner class `when json text is double` : SuccessfulParse(
+            jsonText = "456.890",
+            expectedNode = 456.89.asNode()
+    )
+
+    @Nested
+    inner class `when json text is true` : SuccessfulParse(
+            jsonText = "true",
+            expectedNode = true.asNode()
+    )
+
+    @Nested
+    inner class `when json text is false` : SuccessfulParse(
+            jsonText = "false",
+            expectedNode = false.asNode()
+    )
+
+
+    @Nested
+    inner class `when json text is null` : SuccessfulParse(
+            jsonText = "null",
+            expectedNode = NullNode()
+    )
+
+    @Nested
+    inner class `when json text is empty` : UnsuccessfulParse(
+            jsonText = ""
+    )
+
+    @Nested
+    inner class `when json text is incomplete object` : UnsuccessfulParse(
+            jsonText = "{"
+    )
+
+    @Nested
+    inner class `when json text is incomplete array` : UnsuccessfulParse(
+            jsonText = "["
+    )
+
     open inner class SuccessfulParse(
             jsonText: String,
             private val expectedNode: Node
@@ -99,6 +136,21 @@ class JacksonDecoderTest {
         fun `then parse was successful`() {
             assertOk(result) {
                 it.should.equal(expectedNode)
+            }
+        }
+    }
+
+
+    open inner class UnsuccessfulParse(
+            jsonText: String
+    )
+    {
+        private val decoder = JacksonDecoder()
+        private val result = decoder.decode(jsonText)
+
+        @Test
+        fun `then parse was unsuccessful`() {
+            assertErr(result) {
             }
         }
     }

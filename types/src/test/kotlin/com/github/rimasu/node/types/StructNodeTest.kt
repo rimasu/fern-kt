@@ -86,6 +86,35 @@ class StructNodeTest : NodeTest() {
         fun `then result is incompatible`() = assertIncompatibleValue()
     }
 
+
+    @Nested
+    inner class `when getting struct node as long`  : WhenGettingNodeAsLong(EMPTY) {
+        @Test
+        fun `then result is incompatible`() = assertIncompatibleValue()
+    }
+
+
+    @Nested
+    inner class `when getting struct node as float`  : WhenGettingNodeAsFloat(EMPTY) {
+        @Test
+        fun `then result is incompatible`() = assertIncompatibleValue()
+    }
+
+
+    @Nested
+    inner class `when getting struct node as double`  : WhenGettingNodeAsDouble(EMPTY) {
+        @Test
+        fun `then result is incompatible`() = assertIncompatibleValue()
+    }
+
+    @Nested
+    inner class `when getting struct node as boolean`  : WhenGettingNodeAsBoolean(EMPTY) {
+        @Test
+        fun `then result is incompatible`() = assertIncompatibleValue()
+    }
+
+
+
     @Nested
     inner class `when getting struct node as struct`  : WhenGettingNodeAsStruct(EMPTY) {
         @Test

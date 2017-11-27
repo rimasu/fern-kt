@@ -47,6 +47,22 @@ abstract class WhenGettingNodeAsInt(node: Node) : WhenGettingNode<Int>(node) {
     override val result = node.asInt()
 }
 
+abstract class WhenGettingNodeAsLong(node: Node) : WhenGettingNode<Long>(node) {
+    override val result = node.asLong()
+}
+
+abstract class WhenGettingNodeAsDouble(node: Node) : WhenGettingNode<Double>(node) {
+    override val result = node.asDouble()
+}
+
+abstract class WhenGettingNodeAsFloat(node: Node) : WhenGettingNode<Float>(node) {
+    override val result = node.asFloat()
+}
+
+abstract class WhenGettingNodeAsBoolean(node: Node) : WhenGettingNode<Boolean>(node) {
+    override val result = node.asBoolean()
+}
+
 abstract class WhenGettingNodeAsStruct(node: Node) : WhenGettingNode<StructNode>(node) {
     override val result = node.asStruct()
 }

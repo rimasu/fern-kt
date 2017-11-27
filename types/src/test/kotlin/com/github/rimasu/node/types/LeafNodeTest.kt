@@ -28,6 +28,11 @@ class LeafNodeTest : NodeTest() {
 
     companion object {
         private val INTEGER_VALUE = 345234
+        private val LONG_VALUE = 23423423443L
+        private val FLOAT_VALUE = 34.45f
+        private val DOUBLE_VALUE = 34.234234234
+        private val TRUE_VALUE = "TrUe"
+        private val FALSE_VALUE = false
         private val STRING_WITH_INTEGER_CONTENT = INTEGER_VALUE.toString()
         private val STRING_WITH_NON_INTEGER_CONTENT = "Some non-integer text"
     }
@@ -73,6 +78,60 @@ class LeafNodeTest : NodeTest() {
     inner class `when getting leaf node with integer content as integer`  : WhenGettingNodeAsInt(INTEGER_VALUE.asNode()) {
         @Test
         fun `then result is ok`() = assertValueRetrieved(INTEGER_VALUE)
+    }
+
+    @Nested
+    inner class `when getting leaf node with long content as long`  : WhenGettingNodeAsLong(LONG_VALUE.asNode()) {
+        @Test
+        fun `then result is ok`() = assertValueRetrieved(LONG_VALUE)
+    }
+
+    @Nested
+    inner class `when getting leaf node with non-long content as long`  : WhenGettingNodeAsLong(STRING_NODE) {
+        @Test
+        fun `then result is incompatible`() = assertIncompatibleValue()
+    }
+
+    @Nested
+    inner class `when getting leaf node with float content as float`  : WhenGettingNodeAsFloat(FLOAT_VALUE.asNode()) {
+        @Test
+        fun `then result is ok`() = assertValueRetrieved(FLOAT_VALUE)
+    }
+
+    @Nested
+    inner class `when getting leaf node with non-float content as float`  : WhenGettingNodeAsFloat(STRING_NODE) {
+        @Test
+        fun `then result is incompatible`() = assertIncompatibleValue()
+    }
+
+    @Nested
+    inner class `when getting leaf node with double content as double`  : WhenGettingNodeAsDouble(DOUBLE_VALUE.asNode()) {
+        @Test
+        fun `then result is ok`() = assertValueRetrieved(DOUBLE_VALUE)
+    }
+
+    @Nested
+    inner class `when getting leaf node with non-double content as double`  : WhenGettingNodeAsDouble(STRING_NODE) {
+        @Test
+        fun `then result is incompatible`() = assertIncompatibleValue()
+    }
+
+    @Nested
+    inner class `when getting leaf node with true content as boolean`  : WhenGettingNodeAsBoolean(TRUE_VALUE.asNode()) {
+        @Test
+        fun `then result is ok`() = assertValueRetrieved(true)
+    }
+
+    @Nested
+    inner class `when getting leaf node with false content as boolean`  : WhenGettingNodeAsBoolean(FALSE_VALUE.asNode()) {
+        @Test
+        fun `then result is ok`() = assertValueRetrieved(false)
+    }
+
+    @Nested
+    inner class `when getting leaf node with non-boolean content as boolean`  : WhenGettingNodeAsBoolean(FLOAT_VALUE.asNode()) {
+        @Test
+        fun `then result is incompatible`() = assertIncompatibleValue()
     }
 
     @Nested

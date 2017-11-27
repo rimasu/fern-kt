@@ -36,6 +36,18 @@ sealed class Node {
     /** Get the value as an integer. Will return an error if the value can not be coerced into a int. */
     open fun asInt(): Result<Int, NodeError> =  incompatibleValue(path)
 
+    /** Get the value as a long. Will return an error if the value can not be coerced into a long. */
+    open fun asLong(): Result<Long, NodeError> =  incompatibleValue(path)
+
+    /** Get the value as a float. Will return an error if the value can not be coerced into a float. */
+    open fun asFloat(): Result<Float, NodeError> =  incompatibleValue(path)
+
+    /** Get the value as a double. Will return an error if the value can not be coerced into a double. */
+    open fun asDouble(): Result<Double, NodeError> =  incompatibleValue(path)
+
+    /** Get the value as a boolean. Will return an error if the value can not be coerced into a boolean. */
+    open fun asBoolean(): Result<Boolean, NodeError> =  incompatibleValue(path)
+
     /** Get the value as node. Will return an error if the value can not be coerced into a node. */
     open fun asStruct(): Result<StructNode, NodeError> = incompatibleValue(path)
 
@@ -69,6 +81,14 @@ fun String.asNode() = LeafNode(this)
 
 fun Int.asNode() = LeafNode(this.toString())
 
+fun Long.asNode() = LeafNode(this.toString())
+
+fun Double.asNode() = LeafNode(this.toString())
+
+fun Float.asNode() = LeafNode(this.toString())
+
+fun Boolean.asNode() = LeafNode(this.toString())
+
 class NullNode : Node() {
     override fun <T> incompatibleValue(path: Path) = Err(IncompatibleValue(path))
 
@@ -98,6 +118,42 @@ data class LeafNode(private val data: String) : Node() {
             Ok(result)
         } else {
             Err(IncompatibleValue(path))
+        }
+    }
+
+    override fun asLong(): Result<Long, NodeError> {
+        val result = data.toLongOrNull()
+        return if (result != null) {
+            Ok(result)
+        } else {
+            Err(IncompatibleValue(path))
+        }
+    }
+
+    override fun asFloat(): Result<Float, NodeError> {
+        val result = data.toFloatOrNull()
+        return if (result != null) {
+            Ok(result)
+        } else {
+            Err(IncompatibleValue(path))
+        }
+    }
+
+    override fun asDouble(): Result<Double, NodeError> {
+        val result = data.toDoubleOrNull()
+        return if (result != null) {
+            Ok(result)
+        } else {
+            Err(IncompatibleValue(path))
+        }
+    }
+
+    override fun asBoolean(): Result<Boolean, NodeError> {
+        return when(data.toLowerCase()) {
+            "true" -> Ok(true)
+            "false"-> Ok(false)
+            else ->  Err(IncompatibleValue(path))
+
         }
     }
 

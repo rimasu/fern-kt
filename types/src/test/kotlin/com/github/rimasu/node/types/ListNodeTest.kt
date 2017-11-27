@@ -87,6 +87,30 @@ class ListNodeTest : NodeTest() {
     }
 
     @Nested
+    inner class `when getting list node as long`  : WhenGettingNodeAsLong(EMPTY) {
+        @Test
+        fun `then result is incompatible`() = assertIncompatibleValue()
+    }
+
+    @Nested
+    inner class `when getting list node as float`  : WhenGettingNodeAsFloat(EMPTY) {
+        @Test
+        fun `then result is incompatible`() = assertIncompatibleValue()
+    }
+
+    @Nested
+    inner class `when getting list node as double`  : WhenGettingNodeAsDouble(EMPTY) {
+        @Test
+        fun `then result is incompatible`() = assertIncompatibleValue()
+    }
+
+    @Nested
+    inner class `when getting list node as boolean`  : WhenGettingNodeAsBoolean(EMPTY) {
+        @Test
+        fun `then result is incompatible`() = assertIncompatibleValue()
+    }
+
+    @Nested
     inner class `when getting list node as struct`  : WhenGettingNodeAsStruct(EMPTY) {
         @Test
         fun `then result is incompatible`() = assertIncompatibleValue()

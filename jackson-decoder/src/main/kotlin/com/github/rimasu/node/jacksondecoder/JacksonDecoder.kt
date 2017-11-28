@@ -28,6 +28,8 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.rimasu.node.types.*
+import com.github.rimasu.text.Position
+import com.github.rimasu.text.Region
 
 /**
  * Responsible for decoding a node structure from a json document.
@@ -96,12 +98,12 @@ class JacksonDecoder(private val jsonFactory: JsonFactory = JsonFactory()) {
         }
     }
 
-    private fun buildAnchor(parser: JsonParser, startLine: Int, startPos: Int): Anchor {
-        return Anchor(
-                startLine,
-                Math.max(1, startPos),
-                parser.currentLocation.lineNr,
-                Math.max(1, parser.currentLocation.columnNr-1)
+    private fun buildAnchor(parser: JsonParser, startLine: Int, startPos: Int): Region {
+        return Region(
+                Position(startLine,
+                Math.max(1, startPos)),
+                Position(parser.currentLocation.lineNr,
+                Math.max(1, parser.currentLocation.columnNr-1))
         )
     }
 

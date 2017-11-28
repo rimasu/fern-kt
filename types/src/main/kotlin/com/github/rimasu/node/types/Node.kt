@@ -23,6 +23,7 @@ package com.github.rimasu.node.types
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
+import com.github.rimasu.text.Region
 
 /** A piece of node */
 sealed class Node {
@@ -30,8 +31,8 @@ sealed class Node {
     private var parent: Node? = null
     private var usage: Step? = null
 
-    /** An optional anchor than describes the nodes original location in a source document */
-    abstract val anchor: Anchor?
+    /** An optional anchor than describes the text region in a source document that contained the serialized node. */
+    abstract val anchor: Region?
 
     /** Get the value as a string. Will return an error if the value can not be coerced into a string. */
     open fun asString(): Result<String, NodeError> = Err(IncompatibleValue(path, anchor))
@@ -78,19 +79,19 @@ sealed class Node {
     }
 }
 
-fun String.asNode(anchor: Anchor? = null) = LeafNode(this, anchor)
+fun String.asNode(anchor: Region? = null) = LeafNode(this, anchor)
 
-fun Int.asNode(anchor: Anchor? = null) = LeafNode(this.toString(), anchor)
+fun Int.asNode(anchor: Region? = null) = LeafNode(this.toString(), anchor)
 
-fun Long.asNode(anchor: Anchor? = null) = LeafNode(this.toString(), anchor)
+fun Long.asNode(anchor: Region? = null) = LeafNode(this.toString(), anchor)
 
-fun Double.asNode(anchor: Anchor? = null) = LeafNode(this.toString(), anchor)
+fun Double.asNode(anchor: Region? = null) = LeafNode(this.toString(), anchor)
 
-fun Float.asNode(anchor: Anchor? = null) = LeafNode(this.toString(), anchor)
+fun Float.asNode(anchor: Region? = null) = LeafNode(this.toString(), anchor)
 
-fun Boolean.asNode(anchor: Anchor? = null) = LeafNode(this.toString(), anchor)
+fun Boolean.asNode(anchor: Region? = null) = LeafNode(this.toString(), anchor)
 
-class NullNode(override val anchor: Anchor? = null) : Node() {
+class NullNode(override val anchor: Region? = null) : Node() {
 
     override fun toString() = "_"
 
@@ -104,7 +105,7 @@ class NullNode(override val anchor: Anchor? = null) : Node() {
 }
 
 /** A node value that stores a simple value (serialized as a string). */
-data class LeafNode(private val data: String, override val anchor: Anchor? = null) : Node() {
+data class LeafNode(private val data: String, override val anchor: Region? = null) : Node() {
 
     override fun asString(): Result<String, NodeError> {
         return Ok(data)
@@ -161,7 +162,7 @@ data class LeafNode(private val data: String, override val anchor: Anchor? = nul
 /**
  * A structured node, where values can be addressed by labels.
  */
-class StructNode(values: Map<String, Node>, override val anchor: Anchor? = null) : Node() {
+class StructNode(values: Map<String, Node>, override val anchor: Region? = null) : Node() {
 
     init { values.forEach { (label, value) -> value.setParent(this, LabelStep(label)) } }
 
@@ -204,7 +205,7 @@ class StructNode(values: Map<String, Node>, override val anchor: Anchor? = null)
 /**
  * A ordered node, where values can be addressed by index (starting from one).
  */
-class ListNode(nodes: List<Node>, override val anchor: Anchor? = null) : Iterable<Node>, Node() {
+class ListNode(nodes: List<Node>, override val anchor: Region? = null) : Iterable<Node>, Node() {
 
     init { nodes.forEachIndexed { index, node -> node.setParent(this, IndexStep(index + 1)) } }
 

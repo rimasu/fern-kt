@@ -20,10 +20,11 @@
  */
 package com.github.rimasu.node.jacksondecoder
 
-import com.github.rimasu.node.types.Anchor
+import com.github.rimasu.text.Region
 
 data class ParseError(
-        val anchor: Anchor
+        /** region of the source document that triggered the error. */
+        val source: Region
 ) {
 
 }

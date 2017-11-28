@@ -34,30 +34,28 @@ sealed class Node {
     abstract val anchor: Anchor?
 
     /** Get the value as a string. Will return an error if the value can not be coerced into a string. */
-    open fun asString(): Result<String, NodeError> = incompatibleValue()
+    open fun asString(): Result<String, NodeError> = Err(IncompatibleValue(path, anchor))
 
     /** Get the value as an integer. Will return an error if the value can not be coerced into a int. */
-    open fun asInt(): Result<Int, NodeError> =  incompatibleValue()
+    open fun asInt(): Result<Int, NodeError> =  Err(IncompatibleValue(path, anchor))
 
     /** Get the value as a long. Will return an error if the value can not be coerced into a long. */
-    open fun asLong(): Result<Long, NodeError> =  incompatibleValue()
+    open fun asLong(): Result<Long, NodeError> =  Err(IncompatibleValue(path, anchor))
 
     /** Get the value as a float. Will return an error if the value can not be coerced into a float. */
-    open fun asFloat(): Result<Float, NodeError> =  incompatibleValue()
+    open fun asFloat(): Result<Float, NodeError> = Err(IncompatibleValue(path, anchor))
 
     /** Get the value as a double. Will return an error if the value can not be coerced into a double. */
-    open fun asDouble(): Result<Double, NodeError> =  incompatibleValue()
+    open fun asDouble(): Result<Double, NodeError> = Err(IncompatibleValue(path, anchor))
 
     /** Get the value as a boolean. Will return an error if the value can not be coerced into a boolean. */
-    open fun asBoolean(): Result<Boolean, NodeError> =  incompatibleValue()
+    open fun asBoolean(): Result<Boolean, NodeError> = Err(IncompatibleValue(path, anchor))
 
     /** Get the value as node. Will return an error if the value can not be coerced into a node. */
-    open fun asStruct(): Result<StructNode, NodeError> = incompatibleValue()
+    open fun asStruct(): Result<StructNode, NodeError> = Err(IncompatibleValue(path, anchor))
 
     /** Get the value as list of node values. Will return an error if the value can not be coerced into a list. */
-    open fun asList(): Result<ListNode, NodeError> = incompatibleValue()
-
-    abstract fun <T> incompatibleValue() : Result<T, NodeError>
+    open fun asList(): Result<ListNode, NodeError> = Err(IncompatibleValue(path, anchor))
 
     /** path from root configuration to this node. Calculated because this value will change is current
      * root is added to another container. */
@@ -93,7 +91,6 @@ fun Float.asNode(anchor: Anchor? = null) = LeafNode(this.toString(), anchor)
 fun Boolean.asNode(anchor: Anchor? = null) = LeafNode(this.toString(), anchor)
 
 class NullNode(override val anchor: Anchor? = null) : Node() {
-    override fun <T> incompatibleValue() = Err(IncompatibleValue(path, anchor))
 
     override fun toString() = "_"
 
@@ -108,8 +105,6 @@ class NullNode(override val anchor: Anchor? = null) : Node() {
 
 /** A node value that stores a simple value (serialized as a string). */
 data class LeafNode(private val data: String, override val anchor: Anchor? = null) : Node() {
-
-    override fun <T> incompatibleValue() = Err(IncompatibleValue(path, anchor))
 
     override fun asString(): Result<String, NodeError> {
         return Ok(data)
@@ -170,8 +165,6 @@ class StructNode(values: Map<String, Node>, override val anchor: Anchor? = null)
 
     init { values.forEach { (label, value) -> value.setParent(this, LabelStep(label)) } }
 
-    override fun <T> incompatibleValue() = Err(IncompatibleValue(path, anchor))
-
     private val values = values.toMap()
 
     operator fun get(label: String) : Result<Node, NodeError> {
@@ -214,8 +207,6 @@ class StructNode(values: Map<String, Node>, override val anchor: Anchor? = null)
 class ListNode(nodes: List<Node>, override val anchor: Anchor? = null) : Iterable<Node>, Node() {
 
     init { nodes.forEachIndexed { index, node -> node.setParent(this, IndexStep(index + 1)) } }
-
-    override fun <T> incompatibleValue() = Err(IncompatibleValue(path, anchor))
 
     private val values = nodes.toList()
 

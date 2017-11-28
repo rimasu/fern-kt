@@ -7,7 +7,7 @@ apply from: "$gradleDir/common-repos.gradle"
 apply from: "$gradleDir/unit-test-framework.gradle"
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$versionKotlin"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
 }
 

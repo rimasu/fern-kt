@@ -3,7 +3,7 @@ apply plugin: 'ivy-publish'
 publishing {
     repositories {
         ivy {
-            url publicationUrl
+            url publication_url
         }
     }
     publications {

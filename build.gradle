@@ -1,10 +1,12 @@
 buildscript {
+    ext.kotlin_version = '1.2.0'
     repositories {
         mavenCentral()
     }
     dependencies {
         classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0'
         classpath 'gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -24,4 +26,8 @@ ext {
 
 allprojects {
     version "${vcsDetails.getLastTag()}.${vcsDetails.getCommitDistance()}"
+
+    if (!project.hasProperty("publication_url")) {
+        ext.publication_url = "${rootProjectDir}/build/ivy"
+    }
 }

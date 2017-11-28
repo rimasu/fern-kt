@@ -1,5 +1,5 @@
 repositories {
-    maven { url "https://jitpack.io" } // used for danneu result
+    maven { url "https://jitpack.io" } // used for result
 }
 
 dependencies {

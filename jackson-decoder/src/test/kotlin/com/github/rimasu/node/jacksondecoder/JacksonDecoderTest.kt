@@ -20,9 +20,9 @@
  */
 package com.github.rimasu.node.jacksondecoder
 
-import com.github.michaelbull.result.Err
 import com.github.rimasu.node.types.*
 import com.github.rimasu.text.Position
+import com.github.rimasu.text.Region
 import com.winterbe.expekt.should
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -31,19 +31,19 @@ import org.junit.jupiter.api.Test
 class JacksonDecoderTest {
 
     @Nested
-    inner class `when json text is empty structure` : SuccessfulParse(
+    inner class WhenJsonTextIsEmptyStruct : SuccessfulParse(
             jsonText = """{}""",
             expectedNode = StructNode(emptyMap())
     )
 
     @Nested
-    inner class `when json text is empty array` : SuccessfulParse(
+    inner class WhenJsonTextIsEmptyArray : SuccessfulParse(
             jsonText = """[]""",
             expectedNode = ListNode(emptyList())
     )
 
     @Nested
-    inner class `when json text is populated array` : SuccessfulParse(
+    inner class WhenJsonTextIsPopulatedArray : SuccessfulParse(
             jsonText = """["a",1,[],{}]""",
             expectedNode = ListNode(
                     listOf(
@@ -56,7 +56,7 @@ class JacksonDecoderTest {
     )
 
     @Nested
-    inner class `when json text is populated struct` : SuccessfulParse(
+    inner class WhenJsonTextIsPopulatedStruct: SuccessfulParse(
             jsonText = """{"a":"a","b":1,"c":[],"d":{}}""",
             expectedNode = StructNode(
                     mapOf(
@@ -69,64 +69,65 @@ class JacksonDecoderTest {
     )
 
     @Nested
-    inner class `when json text is empty string` : SuccessfulParse(
+    inner class WhenJsonTextIsEmptyString : SuccessfulParse(
             jsonText = "\"\"",
             expectedNode = "".asNode()
+
     )
 
     @Nested
-    inner class `when json text is populated string` : SuccessfulParse(
+    inner class WhenJsonTextIsPopulatedString : SuccessfulParse(
             jsonText = "\"a\"",
             expectedNode = "a".asNode()
     )
 
     @Nested
-    inner class `when json text is integer` : SuccessfulParse(
+    inner class WhenJsonTextIsInteger: SuccessfulParse(
             jsonText = "456",
             expectedNode = 456.asNode()
     )
 
     @Nested
-    inner class `when json text is double` : SuccessfulParse(
+    inner class WhenJsonTextIsDouble : SuccessfulParse(
             jsonText = "456.890",
             expectedNode = 456.89.asNode()
     )
 
     @Nested
-    inner class `when json text is true` : SuccessfulParse(
+    inner class WhenJsonTextIsTrue : SuccessfulParse(
             jsonText = "true",
             expectedNode = true.asNode()
     )
 
     @Nested
-    inner class `when json text is false` : SuccessfulParse(
+    inner class WhenJsonTextIsFalse : SuccessfulParse(
             jsonText = "false",
             expectedNode = false.asNode()
     )
 
 
     @Nested
-    inner class `when json text is null` : SuccessfulParse(
+    inner class WhenJsonTextIsNull : SuccessfulParse(
             jsonText = "null",
             expectedNode = NullNode()
     )
 
     @Nested
-    inner class `when json text is empty` : UnsuccessfulParse(
+    inner class WhenJsonTextIsEmpty : UnsuccessfulParse(
             jsonText = "",
-            expectedPosition = Position(1, 1)
+            expectedPosition = Position(1, 1    )
     )
 
     @Nested
-    inner class `when json text is incomplete object` : UnsuccessfulParse(
+    inner class WhenJsonTextIsIncompleteObject : UnsuccessfulParse(
             jsonText = "{",
-            expectedPosition = Position(1, 1)
+            expectedPosition = Position(1, 2)
     )
 
     @Nested
-    inner class `when json text is incomplete array` : UnsuccessfulParse(
+    inner class WhenJsonIsIncompleteArray : UnsuccessfulParse(
             jsonText = "[",
-            expectedPosition = Position(1, 1)
+            expectedPosition = Position(1, 2)
     )
 
     open inner class SuccessfulParse(
@@ -155,7 +156,7 @@ class JacksonDecoderTest {
         private val result = decoder.decode(jsonText)
 
         @Test
-        fun `then parse error captured expected position`() {
+        fun `then parse error captured`() {
             assertErr(result) {
                 it.where.should.equal(expectedPosition)
             }

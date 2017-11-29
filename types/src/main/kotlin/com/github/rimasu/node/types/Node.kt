@@ -105,7 +105,7 @@ class NullNode(override val anchor: Region? = null) : Node() {
 }
 
 /** A node value that stores a simple value (serialized as a string). */
-data class LeafNode(private val data: String, override val anchor: Region? = null) : Node() {
+class LeafNode(private val data: String, override val anchor: Region? = null) : Node() {
 
     override fun asString(): Result<String, NodeError> {
         return Ok(data)
@@ -157,6 +157,18 @@ data class LeafNode(private val data: String, override val anchor: Region? = nul
     }
 
     override fun toString() = data
+
+    /** Custom hashcode and equals to ignore anchor */
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as LeafNode
+
+        return data == other.data
+    }
+
+    override fun hashCode() = data.hashCode()
 }
 
 /**

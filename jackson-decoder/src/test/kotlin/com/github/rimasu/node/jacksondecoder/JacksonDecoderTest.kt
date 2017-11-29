@@ -20,7 +20,9 @@
  */
 package com.github.rimasu.node.jacksondecoder
 
+import com.github.michaelbull.result.Err
 import com.github.rimasu.node.types.*
+import com.github.rimasu.text.Position
 import com.winterbe.expekt.should
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -111,17 +113,20 @@ class JacksonDecoderTest {
 
     @Nested
     inner class `when json text is empty` : UnsuccessfulParse(
-            jsonText = ""
+            jsonText = "",
+            expectedPosition = Position(1, 1)
     )
 
     @Nested
     inner class `when json text is incomplete object` : UnsuccessfulParse(
-            jsonText = "{"
+            jsonText = "{",
+            expectedPosition = Position(1, 1)
     )
 
     @Nested
     inner class `when json text is incomplete array` : UnsuccessfulParse(
-            jsonText = "["
+            jsonText = "[",
+            expectedPosition = Position(1, 1)
     )
 
     open inner class SuccessfulParse(
@@ -142,15 +147,17 @@ class JacksonDecoderTest {
 
 
     open inner class UnsuccessfulParse(
-            jsonText: String
+            jsonText: String,
+            private val expectedPosition: Position
     )
     {
         private val decoder = JacksonDecoder()
         private val result = decoder.decode(jsonText)
 
         @Test
-        fun `then parse was unsuccessful`() {
+        fun `then parse error captured expected position`() {
             assertErr(result) {
+                it.where.should.equal(expectedPosition)
             }
         }
     }

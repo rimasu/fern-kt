@@ -20,11 +20,11 @@
  */
 package com.github.rimasu.node.jacksondecoder
 
-import com.github.rimasu.text.Region
+import com.github.rimasu.text.Position
 
 data class ParseError(
-        /** region of the source document that triggered the error. */
-        val source: Region
+        /** where in where document that triggered the error. */
+        val where: Position
 ) {
 
 }

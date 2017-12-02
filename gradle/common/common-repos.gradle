@@ -1,0 +1,7 @@
+repositories {
+    	mavenCentral()
+	ivy {
+		url publication_url
+	}
+}
+

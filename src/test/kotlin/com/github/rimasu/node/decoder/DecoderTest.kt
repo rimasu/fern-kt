@@ -73,7 +73,7 @@ class DecoderTest {
             value.should.equal(listNode { add("abcd") })
             value.anchor.should.equal(Region(1, 1, 1, 6))
             value as ListNode
-            with(value[1].expect("should exist")) {
+            with(value[1].expect{}) {
                 should.equal("abcd".asNode())
                 anchor.should.equal(Region(1, 2, 1, 5))
             }
@@ -89,12 +89,12 @@ class DecoderTest {
             value.anchor.should.equal(Region(1, 1, 1, 11))
 
             value as ListNode
-            with(value[1].expect("should exist")) {
+            with(value[1].expect{}) {
                 should.equal("abcd".asNode())
                 anchor.should.equal(Region(1, 2, 1, 5))
             }
 
-            with(value[2].expect("should exist")) {
+            with(value[2].expect{}) {
                 should.equal("efgh".asNode())
                 anchor.should.equal(Region(1, 7, 1, 10))
             }
@@ -109,7 +109,7 @@ class DecoderTest {
             value.should.equal(listNode { add("abcd") })
             value.anchor.should.equal(Region(1, 1, 1, 8))
             value as ListNode
-            with(value[1].expect("should exist")) {
+            with(value[1].expect{}) {
                 should.equal("abcd".asNode())
                 anchor.should.equal(Region(1, 2, 1, 7))
             }
@@ -124,7 +124,7 @@ class DecoderTest {
             value.should.equal(listNode { add("ab\"cd") })
             value.anchor.should.equal(Region(1, 1, 1, 10))
             value as ListNode
-            with(value[1].expect("should exist")) {
+            with(value[1].expect{}) {
                 should.equal("ab\"cd".asNode())
                 anchor.should.equal(Region(1, 2, 1, 9))
             }
@@ -139,11 +139,11 @@ class DecoderTest {
             value.should.equal(listNode { add("abcd"); add("efgh") })
             value.anchor.should.equal(Region(1, 1, 1, 15))
             value as ListNode
-            with(value[1].expect("should exist")) {
+            with(value[1].expect{}) {
                 should.equal("abcd".asNode())
                 anchor.should.equal(Region(1, 2, 1, 7))
             }
-            with(value[2].expect("should exist")) {
+            with(value[2].expect{}) {
                 should.equal("efgh".asNode())
                 anchor.should.equal(Region(1, 9, 1, 14))
             }
@@ -158,7 +158,7 @@ class DecoderTest {
             value.should.equal(listNode { add(listNode {}) })
             value.anchor.should.equal(Region(1, 1, 1, 4))
             value as ListNode
-            with(value[1].expect("should exist")) {
+            with(value[1].expect{}) {
                 should.equal(listNode {})
                 anchor.should.equal(Region(1, 2, 1, 3))
             }
@@ -173,7 +173,7 @@ class DecoderTest {
             value.should.equal(listNode { add(structNode {}) })
             value.anchor.should.equal(Region(1, 1, 1, 4))
             value as ListNode
-            with(value[1].expect("should exist")) {
+            with(value[1].expect{}) {
                 should.equal(structNode {})
                 anchor.should.equal(Region(1, 2, 1, 3))
             }
@@ -226,27 +226,27 @@ class DecoderTest {
             value.anchor.should.equal(Region(1, 1, 1, 27))
 
             value as StructNode
-            with(value["a"].expect("should exist")) {
+            with(value["a"].expect{}) {
                 should.equal("1".asNode())
                 anchor.should.equal(Region(1, 4, 1, 4))
             }
 
-            with(value["b"].expect("should exist")) {
+            with(value["b"].expect{}) {
                 should.equal("2".asNode())
                 anchor.should.equal(Region(1, 9, 1, 9))
             }
 
-            with(value["c"].expect("should exist")) {
+            with(value["c"].expect{}) {
                 should.equal("3".asNode())
                 anchor.should.equal(Region(1, 15, 1, 15))
             }
 
-            with(value["d"].expect("should exist")) {
+            with(value["d"].expect{}) {
                 should.equal("4".asNode())
                 anchor.should.equal(Region(1, 20, 1, 20))
             }
 
-            with(value["e"].expect("should exist")) {
+            with(value["e"].expect{}) {
                 should.equal("5".asNode())
                 anchor.should.equal(Region(1, 26, 1, 26))
             }
@@ -265,12 +265,12 @@ class DecoderTest {
             value.anchor.should.equal(Region(1, 1, 1, 17))
 
             value as StructNode
-            with(value["a"].expect("should exist")) {
+            with(value["a"].expect{}) {
                 should.equal("1 ".asNode())
                 anchor.should.equal(Region(1, 4, 1, 7))
             }
 
-            with(value["b"].expect("should exist")) {
+            with(value["b"].expect{}) {
                 should.equal(" 2".asNode())
                 anchor.should.equal(Region(1, 12, 1, 15))
             }
@@ -288,7 +288,7 @@ class DecoderTest {
             value.anchor.should.equal(Region(1, 1, 1, 7))
 
             value as StructNode
-            with(value["a"].expect("should exist")) {
+            with(value["a"].expect{}) {
                 should.equal(structNode {})
                 anchor.should.equal(Region(1, 4, 1, 5))
             }
@@ -307,7 +307,7 @@ class DecoderTest {
             value.anchor.should.equal(Region(1, 1, 1, 7))
 
             value as StructNode
-            with(value["a"].expect("should exist")) {
+            with(value["a"].expect{}) {
                 should.equal(listNode {})
                 anchor.should.equal(Region(1, 4, 1, 5))
             }

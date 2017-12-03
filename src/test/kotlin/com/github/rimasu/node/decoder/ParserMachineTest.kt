@@ -58,9 +58,9 @@ class ParserMachineTest {
         parse("[a b 34.2]").should.equal(
                 Ok(
                         listNode {
-                            add ("a")
-                            add ("b")
-                            add ("34.2")
+                            add("a")
+                            add("b")
+                            add("34.2")
                         }
                 )
         )
@@ -140,7 +140,7 @@ class ParserMachineTest {
                         StructNode(
                                 mapOf(
                                         "a" to 5.asNode(),
-                                        "b" to listNode {  }
+                                        "b" to listNode { }
                                 ))
                 )
         )
@@ -159,6 +159,28 @@ class ParserMachineTest {
         )
     }
 
+    @Test
+    fun parse12() {
+            parse("[\"a b\"\" a \"]").should.equal(
+                    Ok(
+                            listNode {
+                                add("a b")
+                                add(" a ")
+                            }
+                    )
+            )
+    }
+
+    @Test
+    fun parse13() {
+        parse("[\" |\" \"]").should.equal(
+                Ok(
+                        listNode {
+                            add(" \" ")
+                        }
+                )
+        )
+    }
 
     private fun parse(s: String): Result<Node, Unit> {
         val root = RootState()
@@ -166,7 +188,7 @@ class ParserMachineTest {
         s.codePoints().forEach {
             val type = CodePointType.classify(it)
             state = state.push(type, it)
-           // println("$state")
+            // println("$state")
         }
         return if (state === root) {
             Ok(root.value)

@@ -56,7 +56,6 @@ internal class RootState : ParentState() {
     }
 }
 
-
 internal class LeafNodeState(private val parent: ParentState) : State()
 {
     private val value = StringBuilder()
@@ -75,6 +74,33 @@ internal class LeafNodeState(private val parent: ParentState) : State()
     }
 }
 
+internal class QuotedLeafNodeState(private val parent: ParentState) : State()
+{
+    private val value = StringBuilder()
+    private val escaped = Escaped()
+
+    override fun push(type: CodePointType, codePoint: Int) : State {
+        return when(type) {
+            QUOTE -> {
+                parent.push(value.toString().asNode())
+                parent
+            }
+            ESCAPE -> escaped
+            else -> {
+                value.appendCodePoint(codePoint)
+                this
+            }
+        }
+    }
+
+    private inner class Escaped : State() {
+        override fun push(type: CodePointType, codePoint: Int): State {
+            value.appendCodePoint(codePoint)
+            return this@QuotedLeafNodeState
+        }
+    }
+}
+
 internal class ListNodeState(private val parent: ParentState) : ParentState()
 {
     private val nodes = mutableListOf<Node>()
@@ -84,6 +110,7 @@ internal class ListNodeState(private val parent: ParentState) : ParentState()
     override fun push(type: CodePointType, codePoint: Int): State {
         return when(type) {
             NORMAL -> LeafNodeState(this).push(type, codePoint)
+            QUOTE -> QuotedLeafNodeState(this)
             OPEN_STRUCT -> StructNodeState(this)
             OPEN_LIST -> ListNodeState(this)
             CLOSE_LIST -> finishList()
@@ -92,8 +119,7 @@ internal class ListNodeState(private val parent: ParentState) : ParentState()
         }
     }
 
-    private fun finishList(): State
-    {
+    private fun finishList(): State {
         parent.push(ListNode(nodes))
         return parent
     }
@@ -119,8 +145,7 @@ internal class StructNodeState(private val parent: ParentState) : ParentState()
         }
     }
 
-    private fun finishStruct(): State
-    {
+    private fun finishStruct(): State {
         parent.push(StructNode(nodes))
         return parent
     }
@@ -157,6 +182,7 @@ internal class StructNodeState(private val parent: ParentState) : ParentState()
         override fun push(type: CodePointType, codePoint: Int): State {
             return when(type) {
                 NORMAL ->  LeafNodeState(this@StructNodeState).push(type, codePoint)
+                QUOTE -> QuotedLeafNodeState(this@StructNodeState)
                 OPEN_STRUCT -> StructNodeState(this@StructNodeState)
                 OPEN_LIST -> ListNodeState(this@StructNodeState)
                 WHITE_SPACE -> this

@@ -51,6 +51,16 @@ class CodePointTypeTest {
     }
 
     @Test
+    fun doubleQuoteClassifiedAsQuote() {
+        CodePointType.classify(CodePointType.DOUBLE_QUOTE_CODE_POINT).should.equal(CodePointType.QUOTE)
+    }
+
+    @Test
+    fun pipeClassifiedAsEscape() {
+        CodePointType.classify(CodePointType.PIPE_CODE_POINT).should.equal(CodePointType.ESCAPE)
+    }
+
+    @Test
     fun spaceClassifiedAsWhiteSpace() {
         CodePointType.classify(CodePointType.SPACE_CODE_POINT).should.equal(CodePointType.WHITE_SPACE)
     }

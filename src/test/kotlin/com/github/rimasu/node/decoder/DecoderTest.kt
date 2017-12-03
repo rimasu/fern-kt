@@ -45,7 +45,7 @@ class DecoderTest {
     fun parse2() {
         parse("aoeuaoeu").should.equal(
                 Err(
-                        Unit
+                        DecoderError("")
                 )
 
         )
@@ -180,7 +180,19 @@ class DecoderTest {
         )
     }
 
-    private fun parse(s: String): Result<Node, Unit> {
+    @Test
+    fun parse14() {
+        parse("(   a   =   5  )").should.equal(
+                Ok(
+                        StructNode(
+                                mapOf(
+                                        "a" to 5.asNode()
+                                ))
+                )
+        )
+    }
+
+    private fun parse(s: String): Result<Node, DecoderError> {
         return Decoder.parse(s)
     }
 }

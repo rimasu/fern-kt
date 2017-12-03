@@ -20,6 +20,9 @@
  */
 package com.github.rimasu.node.decoder
 
+/**
+ * Enumeration of code points that have special meaning in the format.
+ */
 internal enum class CodePointType {
 
     NORMAL,

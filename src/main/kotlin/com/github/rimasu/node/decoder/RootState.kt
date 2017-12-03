@@ -20,26 +20,27 @@
  */
 package com.github.rimasu.node.decoder
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
-import com.github.michaelbull.result.Result
-import com.github.rimasu.node.types.*
+import com.github.rimasu.node.types.Node
+import com.github.rimasu.node.types.NullNode
 
-object Decoder {
+/**
+ * State that parses root of document.
+ * Only acceptable code points are open struct, open list and white space.
+ */
+internal class RootState : ParentState() {
 
-    fun parse(s: String) : Result<Node, DecoderError> {
-        val root = RootState()
-        var state: State = root
-        s.codePoints().forEach {
-            val type = CodePointType.classify(it)
-            state = state.push(type, it)
-        }
-        return if (state === root) {
-            Ok(root.value)
-        } else {
-            Err(DecoderError(""))
+    var value: Node = NullNode()
+
+    override fun push(type: CodePointType, codePoint: Int): State {
+        return when(type) {
+            CodePointType.OPEN_STRUCT -> StructNodeState(this)
+            CodePointType.OPEN_LIST -> ListNodeState(this)
+            CodePointType.WHITE_SPACE -> this
+            else -> ErrorState()
         }
     }
+
+    override fun push(node: Node) {
+        this.value = node
+    }
 }
-
-

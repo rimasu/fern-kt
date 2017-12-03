@@ -20,26 +20,34 @@
  */
 package com.github.rimasu.node.decoder
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
-import com.github.michaelbull.result.Result
-import com.github.rimasu.node.types.*
+import com.github.rimasu.node.types.ListNode
+import com.github.rimasu.node.types.Node
 
-object Decoder {
+/**
+ * List node state. Captures a list of values. Any legal start of value
+ * is captured. A close list terminates the state and returns the parent
+ * state.
+ */
+internal class ListNodeState(private val parent: ParentState) : ParentState()
+{
+    private val nodes = mutableListOf<Node>()
 
-    fun parse(s: String) : Result<Node, DecoderError> {
-        val root = RootState()
-        var state: State = root
-        s.codePoints().forEach {
-            val type = CodePointType.classify(it)
-            state = state.push(type, it)
-        }
-        return if (state === root) {
-            Ok(root.value)
-        } else {
-            Err(DecoderError(""))
+    override fun push(node: Node) { nodes.add(node) }
+
+    override fun push(type: CodePointType, codePoint: Int): State {
+        return when(type) {
+            CodePointType.NORMAL -> LeafNodeState(this).push(type, codePoint)
+            CodePointType.QUOTE -> QuotedLeafNodeState(this)
+            CodePointType.OPEN_STRUCT -> StructNodeState(this)
+            CodePointType.OPEN_LIST -> ListNodeState(this)
+            CodePointType.CLOSE_LIST -> finishList()
+            CodePointType.WHITE_SPACE -> this
+            else -> ErrorState()
         }
     }
+
+    private fun finishList(): State {
+        parent.push(ListNode(nodes))
+        return parent
+    }
 }
-
-

@@ -20,26 +20,27 @@
  */
 package com.github.rimasu.node.decoder
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
-import com.github.michaelbull.result.Result
-import com.github.rimasu.node.types.*
+import com.github.rimasu.node.types.asNode
 
-object Decoder {
+/**
+ * Parses the content of unquoted value. All normal code points are captured.
+ * Any other code point terminates the state. When the state is terminated
+ * the codePoint is forwarded to the parent state.
+ */
+internal class LeafNodeState(private val parent: ParentState) : State()
+{
+    private val value = StringBuilder()
 
-    fun parse(s: String) : Result<Node, DecoderError> {
-        val root = RootState()
-        var state: State = root
-        s.codePoints().forEach {
-            val type = CodePointType.classify(it)
-            state = state.push(type, it)
-        }
-        return if (state === root) {
-            Ok(root.value)
-        } else {
-            Err(DecoderError(""))
+    override fun push(type: CodePointType, codePoint: Int) : State {
+        return when(type) {
+            CodePointType.NORMAL -> {
+                value.appendCodePoint(codePoint)
+                this
+            }
+            else -> {
+                parent.push(value.toString().asNode())
+                parent.push(type, codePoint)
+            }
         }
     }
 }
-
-

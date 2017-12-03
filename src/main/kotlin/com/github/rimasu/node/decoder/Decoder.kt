@@ -50,8 +50,8 @@ object Decoder {
     private fun decode(state: State, line: Int, column: Int): Result<Node, DecoderError> {
         return when(state) {
             is RootState -> Ok(state.value)
-            is ErrorState -> Err(DecoderError(state.position))
-            else -> Err(DecoderError(Position(line, column)))
+            is ErrorState -> Err(DecoderError(state.position, state.expectedTypes))
+            else -> Err(DecoderError(Position(line, column), emptyList()))
         }
     }
 }

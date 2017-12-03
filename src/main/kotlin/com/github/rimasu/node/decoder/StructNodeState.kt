@@ -20,8 +20,10 @@
  */
 package com.github.rimasu.node.decoder
 
+import com.github.rimasu.node.decoder.CodePointType.*
 import com.github.rimasu.node.types.Node
 import com.github.rimasu.node.types.StructNode
+import com.github.rimasu.text.Position
 import com.github.rimasu.text.Region
 
 /**
@@ -46,10 +48,13 @@ internal class StructNodeState(
 
     override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
         return when(type) {
-            CodePointType.NORMAL -> inField.push(type, codePoint, line, column)
-            CodePointType.CLOSE_STRUCT -> finishStruct(line, column)
-            CodePointType.WHITE_SPACE -> this
-            else -> ErrorState(line, column)
+            NORMAL -> inField.push(type, codePoint, line, column)
+            CLOSE_STRUCT -> finishStruct(line, column)
+            WHITE_SPACE -> this
+            else -> ErrorState(
+                    expectedTypes = listOf(NORMAL, CLOSE_STRUCT, WHITE_SPACE),
+                    position =  Position(line, column)
+            )
         }
     }
 
@@ -69,10 +74,13 @@ internal class StructNodeState(
 
         override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
             return when(type) {
-                CodePointType.NORMAL ->  { field.appendCodePoint(codePoint); return this }
-                CodePointType.ASSIGNMENT -> postAssign
-                CodePointType.WHITE_SPACE -> preAssign
-                else -> ErrorState(line, column)
+                NORMAL ->  { field.appendCodePoint(codePoint); return this }
+                ASSIGNMENT -> postAssign
+                WHITE_SPACE -> preAssign
+                else -> ErrorState(
+                        expectedTypes = listOf(NORMAL, ASSIGNMENT, WHITE_SPACE),
+                        position =  Position(line, column)
+                )
             }
         }
 
@@ -90,9 +98,12 @@ internal class StructNodeState(
     private inner class PreAssign : State() {
         override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
             return when(type) {
-                CodePointType.ASSIGNMENT -> postAssign
-                CodePointType.WHITE_SPACE -> this
-                else -> ErrorState(line, column)
+                ASSIGNMENT -> postAssign
+                WHITE_SPACE -> this
+                else -> ErrorState(
+                        expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE),
+                        position =  Position(line, column)
+                )
             }
         }
     }
@@ -104,12 +115,15 @@ internal class StructNodeState(
     private inner class PostAssign : State() {
         override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
             return when(type) {
-                CodePointType.NORMAL ->  LeafNodeState(this@StructNodeState, line, column).push(type, codePoint, line, column)
-                CodePointType.QUOTE -> QuotedLeafNodeState(this@StructNodeState, line, column)
-                CodePointType.OPEN_STRUCT -> StructNodeState(this@StructNodeState, line, column)
-                CodePointType.OPEN_LIST -> ListNodeState(this@StructNodeState, line, column)
-                CodePointType.WHITE_SPACE -> this
-                else -> ErrorState(line, column)
+                NORMAL ->  LeafNodeState(this@StructNodeState, line, column).push(type, codePoint, line, column)
+                QUOTE -> QuotedLeafNodeState(this@StructNodeState, line, column)
+                OPEN_STRUCT -> StructNodeState(this@StructNodeState, line, column)
+                OPEN_LIST -> ListNodeState(this@StructNodeState, line, column)
+                WHITE_SPACE -> this
+                else -> ErrorState(
+                        expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, WHITE_SPACE),
+                        position =  Position(line, column)
+                )
             }
         }
     }

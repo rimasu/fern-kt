@@ -22,4 +22,7 @@ package com.github.rimasu.node.decoder
 
 import com.github.rimasu.text.Position
 
-data class DecoderError(val position: Position)
+class DecoderError internal constructor(
+        val position: Position,
+        internal val expectedTypes: List<CodePointType>
+)

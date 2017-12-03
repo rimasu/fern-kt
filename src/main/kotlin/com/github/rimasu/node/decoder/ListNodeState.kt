@@ -20,8 +20,10 @@
  */
 package com.github.rimasu.node.decoder
 
+import com.github.rimasu.node.decoder.CodePointType.*
 import com.github.rimasu.node.types.ListNode
 import com.github.rimasu.node.types.Node
+import com.github.rimasu.text.Position
 import com.github.rimasu.text.Region
 
 /**
@@ -41,13 +43,16 @@ internal class ListNodeState(
 
     override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
         return when(type) {
-            CodePointType.NORMAL -> LeafNodeState(this, line, column).push(type, codePoint, line, column)
-            CodePointType.QUOTE -> QuotedLeafNodeState(this, line, column)
-            CodePointType.OPEN_STRUCT -> StructNodeState(this, line, column)
-            CodePointType.OPEN_LIST -> ListNodeState(this, line, column)
-            CodePointType.CLOSE_LIST -> finishList(line, column)
-            CodePointType.WHITE_SPACE -> this
-            else -> ErrorState(line, column)
+            NORMAL -> LeafNodeState(this, line, column).push(type, codePoint, line, column)
+            QUOTE -> QuotedLeafNodeState(this, line, column)
+            OPEN_STRUCT -> StructNodeState(this, line, column)
+            OPEN_LIST -> ListNodeState(this, line, column)
+            CLOSE_LIST -> finishList(line, column)
+            WHITE_SPACE -> this
+            else -> ErrorState(
+                        expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, CLOSE_LIST, WHITE_SPACE),
+                        position = Position(line, column)
+            )
         }
     }
 

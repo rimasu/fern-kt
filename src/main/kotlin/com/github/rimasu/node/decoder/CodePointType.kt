@@ -43,7 +43,7 @@ internal enum class CodePointType {
 
     WHITE_SPACE;
 
-    companion object {
+    internal companion object {
 
         internal val OPEN_PARENTHESIS_CODE_POINT= '('.toInt()
         internal val CLOSE_PARENTHESIS_CODE_POINT= ')'.toInt()

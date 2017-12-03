@@ -22,8 +22,11 @@ package com.github.rimasu.node.decoder
 
 import com.github.rimasu.text.Position
 
-internal class ErrorState(line: Int, column: Int) : State() {
-    val position = Position(line, column)
+internal class ErrorState(
+        val expectedTypes: List<CodePointType>,
+        val position: Position
+) : State() {
+
     override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
         return this
     }

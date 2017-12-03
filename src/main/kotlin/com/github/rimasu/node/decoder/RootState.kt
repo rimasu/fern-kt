@@ -20,8 +20,10 @@
  */
 package com.github.rimasu.node.decoder
 
+import com.github.rimasu.node.decoder.CodePointType.*
 import com.github.rimasu.node.types.Node
 import com.github.rimasu.node.types.NullNode
+import com.github.rimasu.text.Position
 
 /**
  * State that parses root of document.
@@ -33,10 +35,13 @@ internal class RootState : ParentState() {
 
     override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
         return when(type) {
-            CodePointType.OPEN_STRUCT -> StructNodeState(this, line, column)
-            CodePointType.OPEN_LIST -> ListNodeState(this, line, column)
-            CodePointType.WHITE_SPACE -> this
-            else -> ErrorState(line, column)
+            OPEN_STRUCT -> StructNodeState(this, line, column)
+            OPEN_LIST -> ListNodeState(this, line, column)
+            WHITE_SPACE -> this
+            else -> ErrorState(
+                    expectedTypes = listOf(OPEN_STRUCT, OPEN_LIST, WHITE_SPACE),
+                    position = Position(line, column)
+            )
         }
     }
 

@@ -20,9 +20,8 @@
  */
 package com.github.rimasu.node.decoder
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
-import com.github.michaelbull.result.expect
+import com.github.michaelbull.result.*
+import com.github.rimasu.node.decoder.CodePointType.*
 import com.github.rimasu.node.types.ListNode
 import com.github.rimasu.node.types.Node
 import com.github.rimasu.node.types.StructNode
@@ -316,155 +315,172 @@ class DecoderTest {
         }
     }
 
-
     @Nested
-    inner class ParsingQuotedValueAtRoot : ParseErr (
+    internal inner class ParsingQuotedValueAtRoot : ParseErr (
             text="a",
-            expectedPosition = Position(1,1)
+            expectedPosition = Position(1,1),
+            expectedTypes = listOf(OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
     )
 
     @Nested
-    inner class ParsingCloseStructInList : ParseErr (
+    internal inner class ParsingCloseStructInList : ParseErr (
             text="[)",
-            expectedPosition = Position(1,2)
+            expectedPosition = Position(1,2),
+            expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, CLOSE_LIST, WHITE_SPACE)
     )
 
     @Nested
-    inner class ParsingCloseStructInListWithIntermediateWhiteSpace : ParseErr (
+    internal inner class ParsingCloseStructInListWithIntermediateWhiteSpace : ParseErr (
             text="[\n )",
-            expectedPosition = Position(2, 2)
+            expectedPosition = Position(2, 2),
+            expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, CLOSE_LIST, WHITE_SPACE)
     )
 
     @Nested
-    inner class ParsingIncompleteList : ParseErr (
+    internal inner class ParsingIncompleteList : ParseErr (
             text="[\n ",
-            expectedPosition = Position(2,1)
+            expectedPosition = Position(2,1),
+            expectedTypes = emptyList()
     )
 
     @Nested
-    inner class ParsingCloseListInStruct : ParseErr (
+    internal inner class ParsingCloseListInStruct : ParseErr (
             text="(]",
-            expectedPosition = Position(1,2)
+            expectedPosition = Position(1,2),
+            expectedTypes = listOf(NORMAL, CLOSE_STRUCT, WHITE_SPACE)
     )
 
     @Nested
-    inner class ParsingCloseListInStructWithIntermediateWhiteSpace : ParseErr (
+    internal inner class ParsingCloseListInStructWithIntermediateWhiteSpace : ParseErr (
             text="(\n ]",
-            expectedPosition = Position(2,2)
+            expectedPosition = Position(2,2),
+            expectedTypes = listOf(NORMAL, CLOSE_STRUCT, WHITE_SPACE)
     )
 
     @Nested
-    inner class ParsingIncompleteStruct : ParseErr (
+    internal inner class ParsingIncompleteStruct : ParseErr (
             text="(\n ",
-            expectedPosition = Position(2,1)
+            expectedPosition = Position(2,1),
+            expectedTypes = emptyList()
     )
 
     @Nested
-    inner class ParsingIncompleteField : ParseErr (
+    internal inner class ParsingIncompleteField : ParseErr (
             text="( a \n ",
-            expectedPosition = Position(2,1)
+            expectedPosition = Position(2,1),
+            expectedTypes = emptyList()
     )
 
     @Nested
-    inner class ParsingOpenListBeforeField : ParseErr (
+    internal inner class ParsingOpenListBeforeField : ParseErr (
             text="( ( ",
-            expectedPosition = Position(1,3)
+            expectedPosition = Position(1,3),
+            expectedTypes = listOf(NORMAL, CLOSE_STRUCT, WHITE_SPACE)
     )
 
     @Nested
-    inner class ParsingOpenListDuringFieldName : ParseErr (
+    internal inner class ParsingOpenListDuringFieldName : ParseErr (
             text="( a( ",
-            expectedPosition = Position(1,4)
+            expectedPosition = Position(1,4),
+            expectedTypes = listOf(NORMAL, ASSIGNMENT, WHITE_SPACE)
     )
 
     @Nested
-    inner class ParsingOpenListBeforeAssignment : ParseErr (
+    internal inner class ParsingOpenListBeforeAssignment : ParseErr (
             text="( a ( ",
-            expectedPosition = Position(1,5)
+            expectedPosition = Position(1,5),
+            expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
     )
 
     @Nested
-    inner class ParsingCloseStructBeforeAssignment : ParseErr (
+    internal inner class ParsingCloseStructBeforeAssignment : ParseErr (
             text="( a ) ",
-            expectedPosition = Position(1,5)
+            expectedPosition = Position(1,5),
+            expectedTypes =  listOf(ASSIGNMENT, WHITE_SPACE)
     )
 
     @Nested
-    inner class ParsingCloseStructAfterAssignment : ParseErr (
+    internal inner class ParsingCloseStructAfterAssignment : ParseErr (
             text="( a =)",
-            expectedPosition = Position(1,6)
+            expectedPosition = Position(1,6),
+            expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
     )
 
     @Nested
-    inner class ParsingCloseStructAfterAssignmentWithIntermediateWhitespace : ParseErr (
+    internal inner class ParsingCloseStructAfterAssignmentWithIntermediateWhitespace : ParseErr (
             text="( a = )\n ",
-            expectedPosition = Position(1,7)
+            expectedPosition = Position(1,7),
+            expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
     )
 
     @Nested
-    inner class ParsingOpenStructBeforeAssignment : ParseErr (
+    internal inner class ParsingOpenStructBeforeAssignment : ParseErr (
             text="( a [\"",
-            expectedPosition = Position(1,5)
+            expectedPosition = Position(1,5),
+            expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
     )
 
     @Nested
-    inner class ParsingCloseListBeforeAssignment : ParseErr (
+    internal inner class ParsingCloseListBeforeAssignment : ParseErr (
             text="( a ]\n ",
-            expectedPosition = Position(1,5)
+            expectedPosition = Position(1,5),
+            expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
     )
 
     @Nested
-    inner class ParsingCloseListAfterAssignment : ParseErr (
+    internal inner class ParsingCloseListAfterAssignment : ParseErr (
             text="( a =]\n ",
-            expectedPosition = Position(1,6)
+            expectedPosition = Position(1,6),
+            expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
     )
 
     @Nested
-    inner class ParsingCloseListAfterAssignmentWithIntermediateWhitespace : ParseErr (
+    internal inner class ParsingCloseListAfterAssignmentWithIntermediateWhitespace : ParseErr (
             text="( a = ]\n ",
-            expectedPosition = Position(1,7)
+            expectedPosition = Position(1,7),
+            expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
     )
 
     @Nested
-    inner class ParsingUnquotedValueBeforeAssignment : ParseErr (
+    internal inner class ParsingUnquotedValueBeforeAssignment : ParseErr (
             text="( a a\n ",
-            expectedPosition = Position(1,5)
+            expectedPosition = Position(1,5),
+            expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
     )
 
     @Nested
-    inner class ParsingQuotedValueBeforeAssignment : ParseErr (
+    internal inner class ParsingQuotedValueBeforeAssignment : ParseErr (
             text="( a \" ",
-            expectedPosition = Position(1,5)
+            expectedPosition = Position(1,5),
+            expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
     )
 
     abstract inner class ParseOk(text: String) {
-        private val result = Decoder.parse(text)
+        private val node: Node = Decoder.parse(text).get() ?: fail("Unexpected failure")
 
         @Test
         fun resultIsOk() {
-            when(result) {
-                is Ok -> checkNode(result.value)
-                is Err -> fail("Unexpected failure $result")
-            }
+           checkNode(node)
         }
 
         abstract fun checkNode(value: Node)
     }
 
-    abstract inner class ParseErr(
+    internal abstract inner class ParseErr(
             text: String,
-            private val expectedPosition : Position
+            private val expectedPosition : Position,
+            private val expectedTypes: List<CodePointType>
     ) {
-        private val result = Decoder.parse(text)
+        private val error = Decoder.parse(text).getError() ?: fail("Unexpected success")
 
         @Test
-        fun resultIsError() {
-            when(result) {
-                is Ok -> fail("Unexpected ok $result")
-                is Err -> {
-                    result.error.position.should.equal(expectedPosition)
-                }
-            }
+        fun errorHasExpectedPosition() {
+            error.position.should.equal(expectedPosition)
+        }
+
+        @Test
+        fun errorHasCorrectExpectedCodeTypes() {
+            error.expectedTypes.should.equal(expectedTypes)
         }
     }
 }

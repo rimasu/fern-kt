@@ -316,140 +316,137 @@ class DecoderTest {
     }
 
     @Nested
-    internal inner class ParsingQuotedValueAtRoot : ParseErr (
+    internal inner class ParsingQuotedValueAtRoot : ParseInvalidSyntax(
             text="a",
             expectedPosition = Position(1,1),
             expectedTypes = listOf(OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
     )
 
     @Nested
-    internal inner class ParsingCloseStructInList : ParseErr (
+    internal inner class ParsingCloseStructInList : ParseInvalidSyntax(
             text="[)",
             expectedPosition = Position(1,2),
             expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, CLOSE_LIST, WHITE_SPACE)
     )
 
     @Nested
-    internal inner class ParsingCloseStructInListWithIntermediateWhiteSpace : ParseErr (
+    internal inner class ParsingCloseStructInListWithIntermediateWhiteSpace : ParseInvalidSyntax(
             text="[\n )",
             expectedPosition = Position(2, 2),
             expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, CLOSE_LIST, WHITE_SPACE)
     )
 
     @Nested
-    internal inner class ParsingIncompleteList : ParseErr (
+    internal inner class ParsingIncompleteList : ParseUnexpectedEndOfInput(
             text="[\n ",
-            expectedPosition = Position(2,1),
-            expectedTypes = emptyList()
+            expectedPosition = Position(2,1)
     )
 
     @Nested
-    internal inner class ParsingCloseListInStruct : ParseErr (
+    internal inner class ParsingCloseListInStruct : ParseInvalidSyntax(
             text="(]",
             expectedPosition = Position(1,2),
             expectedTypes = listOf(NORMAL, CLOSE_STRUCT, WHITE_SPACE)
     )
 
     @Nested
-    internal inner class ParsingCloseListInStructWithIntermediateWhiteSpace : ParseErr (
+    internal inner class ParsingCloseListInStructWithIntermediateWhiteSpace : ParseInvalidSyntax(
             text="(\n ]",
             expectedPosition = Position(2,2),
             expectedTypes = listOf(NORMAL, CLOSE_STRUCT, WHITE_SPACE)
     )
 
     @Nested
-    internal inner class ParsingIncompleteStruct : ParseErr (
+    internal inner class ParsingIncompleteStruct : ParseUnexpectedEndOfInput(
             text="(\n ",
-            expectedPosition = Position(2,1),
-            expectedTypes = emptyList()
+            expectedPosition = Position(2,1)
     )
 
     @Nested
-    internal inner class ParsingIncompleteField : ParseErr (
+    internal inner class ParsingIncompleteField : ParseUnexpectedEndOfInput(
             text="( a \n ",
-            expectedPosition = Position(2,1),
-            expectedTypes = emptyList()
+            expectedPosition = Position(2,1)
     )
 
     @Nested
-    internal inner class ParsingOpenListBeforeField : ParseErr (
+    internal inner class ParsingOpenListBeforeField : ParseInvalidSyntax(
             text="( ( ",
             expectedPosition = Position(1,3),
             expectedTypes = listOf(NORMAL, CLOSE_STRUCT, WHITE_SPACE)
     )
 
     @Nested
-    internal inner class ParsingOpenListDuringFieldName : ParseErr (
+    internal inner class ParsingOpenListDuringFieldName : ParseInvalidSyntax(
             text="( a( ",
             expectedPosition = Position(1,4),
             expectedTypes = listOf(NORMAL, ASSIGNMENT, WHITE_SPACE)
     )
 
     @Nested
-    internal inner class ParsingOpenListBeforeAssignment : ParseErr (
+    internal inner class ParsingOpenListBeforeAssignment : ParseInvalidSyntax(
             text="( a ( ",
             expectedPosition = Position(1,5),
             expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
     )
 
     @Nested
-    internal inner class ParsingCloseStructBeforeAssignment : ParseErr (
+    internal inner class ParsingCloseStructBeforeAssignment : ParseInvalidSyntax(
             text="( a ) ",
             expectedPosition = Position(1,5),
             expectedTypes =  listOf(ASSIGNMENT, WHITE_SPACE)
     )
 
     @Nested
-    internal inner class ParsingCloseStructAfterAssignment : ParseErr (
+    internal inner class ParsingCloseStructAfterAssignment : ParseInvalidSyntax(
             text="( a =)",
             expectedPosition = Position(1,6),
             expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
     )
 
     @Nested
-    internal inner class ParsingCloseStructAfterAssignmentWithIntermediateWhitespace : ParseErr (
+    internal inner class ParsingCloseStructAfterAssignmentWithIntermediateWhitespace : ParseInvalidSyntax(
             text="( a = )\n ",
             expectedPosition = Position(1,7),
             expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
     )
 
     @Nested
-    internal inner class ParsingOpenStructBeforeAssignment : ParseErr (
+    internal inner class ParsingOpenStructBeforeAssignment : ParseInvalidSyntax(
             text="( a [\"",
             expectedPosition = Position(1,5),
             expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
     )
 
     @Nested
-    internal inner class ParsingCloseListBeforeAssignment : ParseErr (
+    internal inner class ParsingCloseListBeforeAssignment : ParseInvalidSyntax(
             text="( a ]\n ",
             expectedPosition = Position(1,5),
             expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
     )
 
     @Nested
-    internal inner class ParsingCloseListAfterAssignment : ParseErr (
+    internal inner class ParsingCloseListAfterAssignment : ParseInvalidSyntax(
             text="( a =]\n ",
             expectedPosition = Position(1,6),
             expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
     )
 
     @Nested
-    internal inner class ParsingCloseListAfterAssignmentWithIntermediateWhitespace : ParseErr (
+    internal inner class ParsingCloseListAfterAssignmentWithIntermediateWhitespace : ParseInvalidSyntax(
             text="( a = ]\n ",
             expectedPosition = Position(1,7),
             expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
     )
 
     @Nested
-    internal inner class ParsingUnquotedValueBeforeAssignment : ParseErr (
+    internal inner class ParsingUnquotedValueBeforeAssignment : ParseInvalidSyntax(
             text="( a a\n ",
             expectedPosition = Position(1,5),
             expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
     )
 
     @Nested
-    internal inner class ParsingQuotedValueBeforeAssignment : ParseErr (
+    internal inner class ParsingQuotedValueBeforeAssignment : ParseInvalidSyntax(
             text="( a \" ",
             expectedPosition = Position(1,5),
             expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
@@ -466,7 +463,7 @@ class DecoderTest {
         abstract fun checkNode(value: Node)
     }
 
-    internal abstract inner class ParseErr(
+    internal abstract inner class ParseInvalidSyntax(
             text: String,
             private val expectedPosition : Position,
             private val expectedTypes: List<CodePointType>
@@ -480,7 +477,30 @@ class DecoderTest {
 
         @Test
         fun errorHasCorrectExpectedCodeTypes() {
-            error.expectedTypes.should.equal(expectedTypes)
+            when(error) {
+                is InvalidSyntax ->  error.expectedTypes.should.equal(expectedTypes)
+                else -> fail("Expected syntax error")
+            }
+        }
+    }
+
+    internal abstract inner class ParseUnexpectedEndOfInput(
+            text: String,
+            private val expectedPosition : Position
+    ) {
+        private val error = Decoder.parse(text).getError() ?: fail("Unexpected success")
+
+        @Test
+        fun errorHasExpectedPosition() {
+            error.position.should.equal(expectedPosition)
+        }
+
+        @Test
+        fun errorIsCorrectType() {
+            when(error) {
+                is UnexpectedEndOfInput -> return
+                else -> fail("Expected unexpected end of input")
+            }
         }
     }
 }

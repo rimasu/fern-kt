@@ -22,7 +22,16 @@ package com.github.rimasu.node.decoder
 
 import com.github.rimasu.text.Position
 
-class DecoderError internal constructor(
-        val position: Position,
+
+sealed class DecoderError {
+    abstract val position: Position
+}
+
+class InvalidSyntax internal constructor(
+        override val position: Position,
         internal val expectedTypes: List<CodePointType>
-)
+) : DecoderError()
+
+class UnexpectedEndOfInput(
+        override val position: Position
+) : DecoderError()

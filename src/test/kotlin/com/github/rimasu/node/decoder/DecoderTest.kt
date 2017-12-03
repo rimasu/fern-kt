@@ -38,7 +38,7 @@ import kotlin.test.fail
 class DecoderTest {
 
     @Nested
-    inner class ParseEmptyListAtBeginningOfDocument: GoodParse(
+    inner class ParseEmptyListAtBeginningOfDocument: ParseOk(
             text = "[]"
     ) {
         override fun checkNode(value: Node) {
@@ -48,7 +48,7 @@ class DecoderTest {
     }
 
     @Nested
-    inner class ParseEmptyListAtBeginningOfDocumentWithLeadingWhiteSpace: GoodParse(
+    inner class ParseEmptyListAtBeginningOfDocumentWithLeadingWhiteSpace: ParseOk(
             text = "\n []"
     ) {
         override fun checkNode(value: Node) {
@@ -58,7 +58,7 @@ class DecoderTest {
     }
 
     @Nested
-    inner class ParseEmptyListAtBeginningOfDocumentWithIntermediateWhiteSpace: GoodParse(
+    inner class ParseEmptyListAtBeginningOfDocumentWithIntermediateWhiteSpace: ParseOk(
             text = "[\n ]"
     ) {
         override fun checkNode(value: Node) {
@@ -68,7 +68,7 @@ class DecoderTest {
     }
 
     @Nested
-    inner class ParseUnquotedValueInList: GoodParse(
+    inner class ParseUnquotedValueInList: ParseOk(
             text = "[abcd]"
     ) {
         override fun checkNode(value: Node) {
@@ -83,7 +83,7 @@ class DecoderTest {
     }
 
     @Nested
-    inner class ParseUnquotedValuesInList: GoodParse(
+    inner class ParseUnquotedValuesInList: ParseOk(
             text = "[abcd efgh]"
     ) {
         override fun checkNode(value: Node) {
@@ -104,7 +104,7 @@ class DecoderTest {
     }
 
     @Nested
-    inner class ParseQuotedValueInList: GoodParse(
+    inner class ParseQuotedValueInList: ParseOk(
             text = "[\"abcd\"]"
     ) {
         override fun checkNode(value: Node) {
@@ -119,7 +119,7 @@ class DecoderTest {
     }
 
     @Nested
-    inner class ParseQuotedAndEscapedValueInList: GoodParse(
+    inner class ParseQuotedAndEscapedValueInList: ParseOk(
             text = "[\"ab|\"cd\"]"
     ) {
         override fun checkNode(value: Node) {
@@ -134,7 +134,7 @@ class DecoderTest {
     }
 
     @Nested
-    inner class ParseQuotedValuesInList: GoodParse(
+    inner class ParseQuotedValuesInList: ParseOk(
             text = "[\"abcd\" \"efgh\"]"
     ) {
         override fun checkNode(value: Node) {
@@ -153,7 +153,7 @@ class DecoderTest {
     }
 
     @Nested
-    inner class ParseListInList: GoodParse(
+    inner class ParseListInList: ParseOk(
             text = "[[]]"
     ) {
         override fun checkNode(value: Node) {
@@ -168,7 +168,7 @@ class DecoderTest {
     }
 
     @Nested
-    inner class ParseStructInList: GoodParse(
+    inner class ParseStructInList: ParseOk(
             text = "[()]"
     ) {
         override fun checkNode(value: Node) {
@@ -184,7 +184,7 @@ class DecoderTest {
 
 
     @Nested
-    inner class ParseEmptyStructAtBeginningOfDocument: GoodParse(
+    inner class ParseEmptyStructAtBeginningOfDocument: ParseOk(
             text = "()"
     ) {
         override fun checkNode(value: Node) {
@@ -194,7 +194,7 @@ class DecoderTest {
     }
 
     @Nested
-    inner class ParseEmptyStructAtBeginningOfDocumentWithLeadingWhiteSpace: GoodParse(
+    inner class ParseEmptyStructAtBeginningOfDocumentWithLeadingWhiteSpace: ParseOk(
             text = "\n ()"
     ) {
         override fun checkNode(value: Node) {
@@ -204,7 +204,7 @@ class DecoderTest {
     }
 
     @Nested
-    inner class ParseEmptyStructAtBeginningOfDocumentWithIntermediateWhiteSpace: GoodParse(
+    inner class ParseEmptyStructAtBeginningOfDocumentWithIntermediateWhiteSpace: ParseOk(
             text = "(\n )"
     ) {
         override fun checkNode(value: Node) {
@@ -214,7 +214,7 @@ class DecoderTest {
     }
 
     @Nested
-    inner class ParseUnquotedValuesInStruct: GoodParse(
+    inner class ParseUnquotedValuesInStruct: ParseOk(
             text = "(a=1 b =2 c  =3 d= 4 e=  5)"
     ) {
         override fun checkNode(value: Node) {
@@ -256,7 +256,7 @@ class DecoderTest {
     }
 
     @Nested
-    inner class ParseQuotedValuesInStruct: GoodParse(
+    inner class ParseQuotedValuesInStruct: ParseOk(
             text = "(a=\"1 \" b =\" 2\" )"
     ) {
         override fun checkNode(value: Node) {
@@ -280,7 +280,7 @@ class DecoderTest {
     }
 
     @Nested
-    inner class ParseStructInStruct: GoodParse(
+    inner class ParseStructInStruct: ParseOk(
             text = "(a=() )"
     ) {
         override fun checkNode(value: Node) {
@@ -299,7 +299,7 @@ class DecoderTest {
     }
 
     @Nested
-    inner class ParseListInStruct: GoodParse(
+    inner class ParseListInStruct: ParseOk(
             text = "(a=[] )"
     ) {
         override fun checkNode(value: Node) {
@@ -317,11 +317,197 @@ class DecoderTest {
         }
     }
 
-    abstract inner class GoodParse(text: String) {
+
+    @Nested
+    inner class ParsingQuotedValueAtRoot : ParseErr (
+            text="a"
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(1,1 ))
+        }
+    }
+
+    @Nested
+    inner class ParsingCloseStructInList : ParseErr (
+            text="[)"
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(1,2))
+        }
+    }
+
+    @Nested
+    inner class ParsingCloseStructInListWithIntermediateWhiteSpace : ParseErr (
+            text="[\n )"
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(2,2))
+        }
+    }
+
+    @Nested
+    inner class ParsingIncompleteList : ParseErr (
+            text="[\n "
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(2,1))
+        }
+    }
+
+
+
+
+    @Nested
+    inner class ParsingCloseListInStruct : ParseErr (
+            text="(]"
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(1,2))
+        }
+    }
+
+    @Nested
+    inner class ParsingCloseListInStructWithIntermediateWhiteSpace : ParseErr (
+            text="(\n ]"
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(2,2))
+        }
+    }
+
+    @Nested
+    inner class ParsingIncompleteStruct : ParseErr (
+            text="(\n "
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(2,1))
+        }
+    }
+
+
+    @Nested
+    inner class ParsingIncompleteField : ParseErr (
+            text="( a \n "
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(2,1))
+        }
+    }
+
+
+    @Nested
+    inner class ParsingOpenListBeforeField : ParseErr (
+            text="( ( "
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(1,3))
+        }
+    }
+
+    @Nested
+    inner class ParsingOpenListDuringFieldName : ParseErr (
+            text="( a( "
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(1,4))
+        }
+    }
+
+    @Nested
+    inner class ParsingOpenListBeforeAssignment : ParseErr (
+            text="( a ( "
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(1,5))
+        }
+    }
+
+    @Nested
+    inner class ParsingCloseStructBeforeAssignment : ParseErr (
+            text="( a ) "
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(1,5))
+        }
+    }
+
+    @Nested
+    inner class ParsingCloseStructAfterAssignment : ParseErr (
+            text="( a =)"
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(1,6))
+        }
+    }
+
+    @Nested
+    inner class ParsingCloseStructAfterAssignmentWithIntermediateWhitespace : ParseErr (
+            text="( a = )\n "
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(1,7))
+        }
+    }
+
+    @Nested
+    inner class ParsingOpenStructBeforeAssignment : ParseErr (
+            text="( a [\""
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(1,5))
+        }
+    }
+
+    @Nested
+    inner class ParsingCloseListBeforeAssignment : ParseErr (
+            text="( a ]\n "
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(1,5))
+        }
+    }
+
+    @Nested
+    inner class ParsingCloseListAfterAssignment : ParseErr (
+            text="( a =]\n "
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(1,6))
+        }
+    }
+
+    @Nested
+    inner class ParsingCloseListAfterAssignmentWithIntermediateWhitespace : ParseErr (
+            text="( a = ]\n "
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(1,7))
+        }
+    }
+
+    @Nested
+    inner class ParsingUnquotedValueBeforeAssignment : ParseErr (
+            text="( a a\n "
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(1,5))
+        }
+    }
+
+    @Nested
+    inner class ParsingQuotedValueBeforeAssignment : ParseErr (
+            text="( a \" "
+    ) {
+        override fun checkError(error: DecoderError) {
+            error.position.should.equal(Position(1,5))
+        }
+    }
+
+    abstract inner class ParseOk(text: String) {
         private val result = Decoder.parse(text)
 
         @Test
-        fun resultIsOkay() {
+        fun resultIsOk() {
             when(result) {
                 is Ok -> checkNode(result.value)
                 is Err -> fail("Unexpected failure $result")
@@ -331,81 +517,19 @@ class DecoderTest {
         abstract fun checkNode(value: Node)
     }
 
+    abstract inner class ParseErr(text: String) {
+        private val result = Decoder.parse(text)
 
+        @Test
+        fun resultIsError() {
+            when(result) {
+                is Ok -> fail("Unexpected ok $result")
+                is Err -> checkError(result.error)
+            }
+        }
 
-    @Test
-    fun parse2() {
-        parse("aoeuaoeu").should.equal(
-                Err(
-                        DecoderError(Position(1,1))
-                )
-
-        )
+        abstract fun checkError(error: DecoderError)
     }
 
 
-
-
-
-    @Test
-    fun parse4b() {
-        parse("[)").should.equal(
-                Err(DecoderError(Position(1,2)))
-        )
-    }
-
-    @Test
-    fun parse4c() {
-        parse("[\n)").should.equal(
-                Err(DecoderError(Position(2,1)))
-        )
-    }
-
-    @Test
-    fun parse4d() {
-        parse("[\n )").should.equal(
-                Err(DecoderError(Position(2,2)))
-        )
-    }
-
-    @Test
-    fun parse4e() {
-        parse("[\n ").should.equal(
-                Err(DecoderError(Position(2,1)))
-        )
-    }
-
-    @Test
-    fun parse15() {
-        parse("(   a  (").should.equal(
-                Err(DecoderError(Position(1,8)))
-        )
-    }
-
-    @Test
-    fun parse16() {
-        parse("(   a(").should.equal(
-                Err(DecoderError(Position(1,6)))
-        )
-    }
-
-
-    @Test
-    fun parse17() {
-        parse("(   a  =)").should.equal(
-                Err(DecoderError(Position(1,9)))
-        )
-    }
-
-    @Test
-    fun parse18() {
-        parse("(   ]").should.equal(
-                Err(DecoderError(Position(1,5)))
-        )
-    }
-
-
-    private fun parse(s: String): Result<Node, DecoderError> {
-        return Decoder.parse(s)
-    }
 }

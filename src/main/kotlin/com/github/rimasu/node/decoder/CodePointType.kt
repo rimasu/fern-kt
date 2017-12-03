@@ -1,28 +1,60 @@
+/**
+ * Copyright 2017 Richard Sunderland
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in the
+ * Software without restriction, including without limitation the rights to use, copy,
+ * modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+ * and to permit persons to whom the Software is furnished to do so, subject to the
+ * following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies
+ * or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
 package com.github.rimasu.node.decoder
 
 internal enum class CodePointType {
 
     NORMAL,
 
-    OPEN_PARENTHESIS,
+    OPEN_STRUCT,
 
-    CLOSE_PARENTHESIS,
+    CLOSE_STRUCT,
+
+    OPEN_LIST,
+
+    CLOSE_LIST,
+
+    ASSIGNMENT,
 
     WHITE_SPACE;
 
     companion object {
 
-        private val OPEN_PARENTHESIS_CODE_POINT= '('.toInt()
-        private val CLOSE_PARENTHESIS_CODE_POINT= ')'.toInt()
-        private val SPACE_CODE_POINT= ' '.toInt()
-        private val TAB_CODE_POINT= '\t'.toInt()
-        private val NEW_LINE_CODE_POINT= '\n'.toInt()
-        private val CARRIAGE_RETURN_CODE_POINT= '\r'.toInt()
+        internal val OPEN_PARENTHESIS_CODE_POINT= '('.toInt()
+        internal val CLOSE_PARENTHESIS_CODE_POINT= ')'.toInt()
+        internal val OPEN_SQUARE_BRACKETS_CODE_POINT= '['.toInt()
+        internal val CLOSE_SQUARE_BRACKETS_CODE_POINT= ']'.toInt()
+        internal val EQUALS_CODE_POINT = '='.toInt()
+        internal val SPACE_CODE_POINT= ' '.toInt()
+        internal val TAB_CODE_POINT= '\t'.toInt()
+        internal val NEW_LINE_CODE_POINT= '\n'.toInt()
+        internal val CARRIAGE_RETURN_CODE_POINT= '\r'.toInt()
 
         fun classify(codePoint: Int): CodePointType {
             return when(codePoint) {
-                OPEN_PARENTHESIS_CODE_POINT -> OPEN_PARENTHESIS
-                CLOSE_PARENTHESIS_CODE_POINT -> CLOSE_PARENTHESIS
+                OPEN_PARENTHESIS_CODE_POINT -> OPEN_STRUCT
+                CLOSE_PARENTHESIS_CODE_POINT -> CLOSE_STRUCT
+                OPEN_SQUARE_BRACKETS_CODE_POINT -> OPEN_LIST
+                CLOSE_SQUARE_BRACKETS_CODE_POINT -> CLOSE_LIST
+                EQUALS_CODE_POINT -> ASSIGNMENT
                 SPACE_CODE_POINT -> WHITE_SPACE
                 TAB_CODE_POINT -> WHITE_SPACE
                 NEW_LINE_CODE_POINT -> WHITE_SPACE

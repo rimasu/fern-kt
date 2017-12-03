@@ -52,25 +52,22 @@ internal enum class CodePointType {
         internal val EQUALS_CODE_POINT = '='.toInt()
         internal val PIPE_CODE_POINT = '|'.toInt()
         internal val DOUBLE_QUOTE_CODE_POINT = '"'.toInt()
-        internal val SPACE_CODE_POINT= ' '.toInt()
-        internal val TAB_CODE_POINT= '\t'.toInt()
-        internal val NEW_LINE_CODE_POINT= '\n'.toInt()
-        internal val CARRIAGE_RETURN_CODE_POINT= '\r'.toInt()
+        internal val LINE_FEED = '\n'.toInt()
 
         fun classify(codePoint: Int): CodePointType {
-            return when(codePoint) {
-                OPEN_PARENTHESIS_CODE_POINT -> OPEN_STRUCT
-                CLOSE_PARENTHESIS_CODE_POINT -> CLOSE_STRUCT
-                OPEN_SQUARE_BRACKETS_CODE_POINT -> OPEN_LIST
-                CLOSE_SQUARE_BRACKETS_CODE_POINT -> CLOSE_LIST
-                DOUBLE_QUOTE_CODE_POINT -> QUOTE
-                EQUALS_CODE_POINT -> ASSIGNMENT
-                PIPE_CODE_POINT -> ESCAPE
-                SPACE_CODE_POINT -> WHITE_SPACE
-                TAB_CODE_POINT -> WHITE_SPACE
-                NEW_LINE_CODE_POINT -> WHITE_SPACE
-                CARRIAGE_RETURN_CODE_POINT -> WHITE_SPACE
-                else -> NORMAL
+            return if (Character.isWhitespace(codePoint)) {
+                WHITE_SPACE
+            } else {
+                when (codePoint) {
+                    OPEN_PARENTHESIS_CODE_POINT -> OPEN_STRUCT
+                    CLOSE_PARENTHESIS_CODE_POINT -> CLOSE_STRUCT
+                    OPEN_SQUARE_BRACKETS_CODE_POINT -> OPEN_LIST
+                    CLOSE_SQUARE_BRACKETS_CODE_POINT -> CLOSE_LIST
+                    DOUBLE_QUOTE_CODE_POINT -> QUOTE
+                    EQUALS_CODE_POINT -> ASSIGNMENT
+                    PIPE_CODE_POINT -> ESCAPE
+                    else -> NORMAL
+                }
             }
         }
     }

@@ -62,23 +62,57 @@ class CodePointTypeTest {
 
     @Test
     fun spaceClassifiedAsWhiteSpace() {
-        CodePointType.classify(CodePointType.SPACE_CODE_POINT).should.equal(CodePointType.WHITE_SPACE)
+        CodePointType.classify(' '.toInt()).should.equal(CodePointType.WHITE_SPACE)
     }
 
     @Test
     fun tabClassifiedAsWhiteSpace() {
-        CodePointType.classify(CodePointType.TAB_CODE_POINT).should.equal(CodePointType.WHITE_SPACE)
+        CodePointType.classify('\t'.toInt()).should.equal(CodePointType.WHITE_SPACE)
     }
 
     @Test
-    fun newLineClassifiedAsWhiteSpace() {
-        CodePointType.classify(CodePointType.NEW_LINE_CODE_POINT).should.equal(CodePointType.WHITE_SPACE)
+    fun lineFeedClassifiedAsWhiteSpace() {
+        CodePointType.classify(CodePointType.LINE_FEED).should.equal(CodePointType.WHITE_SPACE)
+    }
+
+    @Test
+    fun verticalTabClassifiedAsWhiteSpace() {
+        CodePointType.classify(0x0B).should.equal(CodePointType.WHITE_SPACE)
+    }
+
+    @Test
+    fun formFeedTabClassifiedAsWhiteSpace() {
+        CodePointType.classify(0x0C).should.equal(CodePointType.WHITE_SPACE)
     }
 
     @Test
     fun carriageReturnClassifiedAsWhiteSpace() {
-        CodePointType.classify(CodePointType.CARRIAGE_RETURN_CODE_POINT).should.equal(CodePointType.WHITE_SPACE)
+        CodePointType.classify('\r'.toInt()).should.equal(CodePointType.WHITE_SPACE)
     }
+
+    @Test
+    fun fileSeparatorTabClassifiedAsWhiteSpace() {
+        CodePointType.classify(0x1C).should.equal(CodePointType.WHITE_SPACE)
+    }
+
+    @Test
+    fun groupSeparatorTabClassifiedAsWhiteSpace() {
+        CodePointType.classify(0x1D).should.equal(CodePointType.WHITE_SPACE)
+    }
+
+    @Test
+    fun recordSeparatorTabClassifiedAsWhiteSpace() {
+        CodePointType.classify(0x1E).should.equal(CodePointType.WHITE_SPACE)
+    }
+
+    @Test
+    fun unitSeparatorTabClassifiedAsWhiteSpace() {
+        CodePointType.classify(0x1F).should.equal(CodePointType.WHITE_SPACE)
+    }
+
+
+
+
 
     @Test
     fun aClassifiedAsNormal() {

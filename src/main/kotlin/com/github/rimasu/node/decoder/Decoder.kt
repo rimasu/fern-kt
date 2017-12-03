@@ -34,7 +34,7 @@ object Decoder {
         var line = 1
         var column = 0
         s.codePoints().forEach {
-            if (it == CodePointType.NEW_LINE_CODE_POINT) {
+            if (it == CodePointType.LINE_FEED) {
                 line++
                 column = 0
             } else {

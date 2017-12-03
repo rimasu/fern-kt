@@ -27,6 +27,7 @@ import com.github.rimasu.node.types.ListNode
 import com.github.rimasu.node.types.Node
 import com.github.rimasu.node.types.StructNode
 import com.github.rimasu.node.types.asNode
+import com.github.rimasu.text.Position
 import com.winterbe.expekt.should
 import org.junit.jupiter.api.Test
 
@@ -42,10 +43,19 @@ class DecoderTest {
     }
 
     @Test
+    fun parse1b() {
+        parse(" [] ").should.equal(
+                Ok(
+                        ListNode(emptyList())
+                )
+        )
+    }
+
+    @Test
     fun parse2() {
         parse("aoeuaoeu").should.equal(
                 Err(
-                        DecoderError("")
+                        DecoderError(Position(1,1))
                 )
 
         )
@@ -66,7 +76,7 @@ class DecoderTest {
 
     @Test
     fun parse4() {
-        parse("[[a b][3]]").should.equal(
+        parse("[[a b][3]()\"\"]").should.equal(
                 Ok(
                         listNode {
                             add(listNode {
@@ -76,9 +86,39 @@ class DecoderTest {
                             add(listNode {
                                 add("3")
                             })
+                            add(StructNode(emptyMap()))
+                            add("".asNode())
                         }
                 )
 
+        )
+    }
+
+    @Test
+    fun parse4b() {
+        parse("[)").should.equal(
+                Err(DecoderError(Position(1,2)))
+        )
+    }
+
+    @Test
+    fun parse4c() {
+        parse("[\n)").should.equal(
+                Err(DecoderError(Position(2,1)))
+        )
+    }
+
+    @Test
+    fun parse4d() {
+        parse("[\n )").should.equal(
+                Err(DecoderError(Position(2,2)))
+        )
+    }
+
+    @Test
+    fun parse4e() {
+        parse("[\n ").should.equal(
+                Err(DecoderError(Position(2,1)))
         )
     }
 
@@ -158,6 +198,19 @@ class DecoderTest {
     }
 
     @Test
+    fun parse11b() {
+        parse("(a=5 b=\"\")").should.equal(
+                Ok(
+                        StructNode(
+                                mapOf(
+                                        "a" to 5.asNode(),
+                                        "b" to "".asNode()
+                                ))
+                )
+        )
+    }
+
+    @Test
     fun parse12() {
             parse("[\"a b\"\" a \"]").should.equal(
                     Ok(
@@ -191,6 +244,36 @@ class DecoderTest {
                 )
         )
     }
+
+    @Test
+    fun parse15() {
+        parse("(   a  (").should.equal(
+                Err(DecoderError(Position(1,8)))
+        )
+    }
+
+    @Test
+    fun parse16() {
+        parse("(   a(").should.equal(
+                Err(DecoderError(Position(1,6)))
+        )
+    }
+
+
+    @Test
+    fun parse17() {
+        parse("(   a  =)").should.equal(
+                Err(DecoderError(Position(1,9)))
+        )
+    }
+
+    @Test
+    fun parse18() {
+        parse("(   ]").should.equal(
+                Err(DecoderError(Position(1,5)))
+        )
+    }
+
 
     private fun parse(s: String): Result<Node, DecoderError> {
         return Decoder.parse(s)

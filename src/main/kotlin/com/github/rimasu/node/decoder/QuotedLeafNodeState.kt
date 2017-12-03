@@ -32,7 +32,7 @@ internal class QuotedLeafNodeState(private val parent: ParentState) : State()
     private val value = StringBuilder()
     private val escaped = Escaped()
 
-    override fun push(type: CodePointType, codePoint: Int) : State {
+    override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int) : State {
         return when(type) {
             CodePointType.QUOTE -> {
                 parent.push(value.toString().asNode())
@@ -47,7 +47,7 @@ internal class QuotedLeafNodeState(private val parent: ParentState) : State()
     }
 
     private inner class Escaped : State() {
-        override fun push(type: CodePointType, codePoint: Int): State {
+        override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
             value.appendCodePoint(codePoint)
             return this@QuotedLeafNodeState
         }

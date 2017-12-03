@@ -31,7 +31,7 @@ internal class LeafNodeState(private val parent: ParentState) : State()
 {
     private val value = StringBuilder()
 
-    override fun push(type: CodePointType, codePoint: Int) : State {
+    override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int) : State {
         return when(type) {
             CodePointType.NORMAL -> {
                 value.appendCodePoint(codePoint)
@@ -39,7 +39,7 @@ internal class LeafNodeState(private val parent: ParentState) : State()
             }
             else -> {
                 parent.push(value.toString().asNode())
-                parent.push(type, codePoint)
+                parent.push(type, codePoint, line, column)
             }
         }
     }

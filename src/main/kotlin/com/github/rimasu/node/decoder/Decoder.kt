@@ -24,20 +24,34 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.rimasu.node.types.*
+import com.github.rimasu.text.Position
 
 object Decoder {
 
     fun parse(s: String) : Result<Node, DecoderError> {
         val root = RootState()
         var state: State = root
+        var line = 1
+        var column = 0
         s.codePoints().forEach {
+            if (it == CodePointType.NEW_LINE_CODE_POINT) {
+                line++
+                column = 0
+            } else {
+                column++
+            }
             val type = CodePointType.classify(it)
-            state = state.push(type, it)
+            state = state.push(type, it, line, column)
         }
-        return if (state === root) {
-            Ok(root.value)
-        } else {
-            Err(DecoderError(""))
+
+        return decode(state, line, column)
+    }
+
+    private fun decode(state: State, line: Int, column: Int): Result<Node, DecoderError> {
+        return when(state) {
+            is RootState -> Ok(state.value)
+            is ErrorState -> Err(DecoderError(state.position))
+            else -> Err(DecoderError(Position(line, column)))
         }
     }
 }

@@ -20,5 +20,6 @@
  */
 package com.github.rimasu.node.decoder
 
-data class DecoderError(val data: String) {
-}
+import com.github.rimasu.text.Position
+
+data class DecoderError(val position: Position)

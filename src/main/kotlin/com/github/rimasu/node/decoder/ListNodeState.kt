@@ -34,15 +34,15 @@ internal class ListNodeState(private val parent: ParentState) : ParentState()
 
     override fun push(node: Node) { nodes.add(node) }
 
-    override fun push(type: CodePointType, codePoint: Int): State {
+    override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
         return when(type) {
-            CodePointType.NORMAL -> LeafNodeState(this).push(type, codePoint)
+            CodePointType.NORMAL -> LeafNodeState(this).push(type, codePoint, line, column)
             CodePointType.QUOTE -> QuotedLeafNodeState(this)
             CodePointType.OPEN_STRUCT -> StructNodeState(this)
             CodePointType.OPEN_LIST -> ListNodeState(this)
             CodePointType.CLOSE_LIST -> finishList()
             CodePointType.WHITE_SPACE -> this
-            else -> ErrorState()
+            else -> ErrorState(line, column)
         }
     }
 

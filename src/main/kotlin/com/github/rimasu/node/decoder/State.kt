@@ -25,7 +25,17 @@ package com.github.rimasu.node.decoder
  */
 internal abstract class State {
     abstract fun push(
+
+            /** Type of the current symbol, as classified by [CodePointType.classify]. */
             type: CodePointType,
-            codePoint: Int
+
+            /** Code point of the current symbol*/
+            codePoint: Int,
+
+            /** Line of the source document, starting at one, incrementing on new line characters */
+            line: Int,
+
+            /** Column in the source document, starting at one, incrementing once for each code point (not byte) */
+            column: Int
     ) : State
 }

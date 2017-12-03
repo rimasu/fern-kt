@@ -39,12 +39,12 @@ internal class StructNodeState(private val parent: ParentState) : ParentState()
         nodes.put(inField.popFieldName(), node)
     }
 
-    override fun push(type: CodePointType, codePoint: Int): State {
+    override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
         return when(type) {
-            CodePointType.NORMAL -> inField.push(type, codePoint)
+            CodePointType.NORMAL -> inField.push(type, codePoint, line, column)
             CodePointType.CLOSE_STRUCT -> finishStruct()
             CodePointType.WHITE_SPACE -> this
-            else -> ErrorState()
+            else -> ErrorState(line, column)
         }
     }
 
@@ -62,12 +62,12 @@ internal class StructNodeState(private val parent: ParentState) : ParentState()
     private inner class FieldNameState : State() {
         private val field = StringBuilder()
 
-        override fun push(type: CodePointType, codePoint: Int): State {
+        override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
             return when(type) {
                 CodePointType.NORMAL ->  { field.appendCodePoint(codePoint); return this }
                 CodePointType.ASSIGNMENT -> postAssign
                 CodePointType.WHITE_SPACE -> preAssign
-                else -> ErrorState()
+                else -> ErrorState(line, column)
             }
         }
 
@@ -83,11 +83,11 @@ internal class StructNodeState(private val parent: ParentState) : ParentState()
      * Only valid value is white space or assignment.
      */
     private inner class PreAssign : State() {
-        override fun push(type: CodePointType, codePoint: Int): State {
+        override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
             return when(type) {
                 CodePointType.ASSIGNMENT -> postAssign
                 CodePointType.WHITE_SPACE -> this
-                else -> ErrorState()
+                else -> ErrorState(line, column)
             }
         }
     }
@@ -97,14 +97,14 @@ internal class StructNodeState(private val parent: ParentState) : ParentState()
      * White space is ignored.
      */
     private inner class PostAssign : State() {
-        override fun push(type: CodePointType, codePoint: Int): State {
+        override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
             return when(type) {
-                CodePointType.NORMAL ->  LeafNodeState(this@StructNodeState).push(type, codePoint)
+                CodePointType.NORMAL ->  LeafNodeState(this@StructNodeState).push(type, codePoint, line, column)
                 CodePointType.QUOTE -> QuotedLeafNodeState(this@StructNodeState)
                 CodePointType.OPEN_STRUCT -> StructNodeState(this@StructNodeState)
                 CodePointType.OPEN_LIST -> ListNodeState(this@StructNodeState)
                 CodePointType.WHITE_SPACE -> this
-                else -> ErrorState()
+                else -> ErrorState(line, column)
             }
         }
     }

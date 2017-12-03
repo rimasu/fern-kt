@@ -31,12 +31,12 @@ internal class RootState : ParentState() {
 
     var value: Node = NullNode()
 
-    override fun push(type: CodePointType, codePoint: Int): State {
+    override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
         return when(type) {
             CodePointType.OPEN_STRUCT -> StructNodeState(this)
             CodePointType.OPEN_LIST -> ListNodeState(this)
             CodePointType.WHITE_SPACE -> this
-            else -> ErrorState()
+            else -> ErrorState(line, column)
         }
     }
 

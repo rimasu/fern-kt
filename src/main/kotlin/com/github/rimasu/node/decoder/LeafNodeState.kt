@@ -20,27 +20,38 @@
  */
 package com.github.rimasu.node.decoder
 
-import com.github.rimasu.node.types.asNode
+import com.github.rimasu.node.types.LeafNode
+import com.github.rimasu.text.Region
 
 /**
  * Parses the content of unquoted value. All normal code points are captured.
  * Any other code point terminates the state. When the state is terminated
  * the codePoint is forwarded to the parent state.
  */
-internal class LeafNodeState(private val parent: ParentState) : State()
+internal class LeafNodeState(
+        private val parent: ParentState,
+        private val startLine: Int,
+        private val startColumn: Int
+) : State()
 {
     private val value = StringBuilder()
+    private var endLine = startLine
+    private var endColumn = startColumn
 
     override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int) : State {
         return when(type) {
             CodePointType.NORMAL -> {
                 value.appendCodePoint(codePoint)
+                endLine = line
+                endColumn = column
                 this
             }
             else -> {
-                parent.push(value.toString().asNode())
+                val anchor = Region(startLine, startColumn, endLine, endColumn)
+                parent.push(LeafNode(value.toString(), anchor))
                 parent.push(type, codePoint, line, column)
             }
         }
     }
+
 }

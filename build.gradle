@@ -35,7 +35,7 @@ if (!project.hasProperty("publication_url")) {
 }
 
 dependencies {
-	compile "com.github.rimasu.node:node-types:0.0.40"
+	compile "com.github.rimasu.node:node-types:0.0.41"
 
 }
 

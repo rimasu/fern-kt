@@ -22,13 +22,18 @@ package com.github.rimasu.node.decoder
 
 import com.github.rimasu.node.types.ListNode
 import com.github.rimasu.node.types.Node
+import com.github.rimasu.text.Region
 
 /**
  * List node state. Captures a list of values. Any legal start of value
  * is captured. A close list terminates the state and returns the parent
  * state.
  */
-internal class ListNodeState(private val parent: ParentState) : ParentState()
+internal class ListNodeState(
+        private val parent: ParentState,
+        private val startLine: Int,
+        private val startColumn: Int
+) : ParentState()
 {
     private val nodes = mutableListOf<Node>()
 
@@ -36,18 +41,18 @@ internal class ListNodeState(private val parent: ParentState) : ParentState()
 
     override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
         return when(type) {
-            CodePointType.NORMAL -> LeafNodeState(this).push(type, codePoint, line, column)
-            CodePointType.QUOTE -> QuotedLeafNodeState(this)
-            CodePointType.OPEN_STRUCT -> StructNodeState(this)
-            CodePointType.OPEN_LIST -> ListNodeState(this)
-            CodePointType.CLOSE_LIST -> finishList()
+            CodePointType.NORMAL -> LeafNodeState(this, line, column).push(type, codePoint, line, column)
+            CodePointType.QUOTE -> QuotedLeafNodeState(this, line, column)
+            CodePointType.OPEN_STRUCT -> StructNodeState(this, line, column)
+            CodePointType.OPEN_LIST -> ListNodeState(this, line, column)
+            CodePointType.CLOSE_LIST -> finishList(line, column)
             CodePointType.WHITE_SPACE -> this
             else -> ErrorState(line, column)
         }
     }
 
-    private fun finishList(): State {
-        parent.push(ListNode(nodes))
+    private fun finishList(endLine: Int, endColumn: Int): State {
+        parent.push(ListNode(nodes, Region(startLine, startColumn, endLine, endColumn)))
         return parent
     }
 }

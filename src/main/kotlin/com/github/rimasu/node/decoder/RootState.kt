@@ -33,8 +33,8 @@ internal class RootState : ParentState() {
 
     override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
         return when(type) {
-            CodePointType.OPEN_STRUCT -> StructNodeState(this)
-            CodePointType.OPEN_LIST -> ListNodeState(this)
+            CodePointType.OPEN_STRUCT -> StructNodeState(this, line, column)
+            CodePointType.OPEN_LIST -> ListNodeState(this, line, column)
             CodePointType.WHITE_SPACE -> this
             else -> ErrorState(line, column)
         }

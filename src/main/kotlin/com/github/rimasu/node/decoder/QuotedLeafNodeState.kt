@@ -20,14 +20,19 @@
  */
 package com.github.rimasu.node.decoder
 
-import com.github.rimasu.node.types.asNode
+import com.github.rimasu.node.types.LeafNode
+import com.github.rimasu.text.Region
 
 /**
  * Parses the content of quoted value. All code points are captured apart
  * from quote and escape characters. Any character after escape is captured.
  * An unescaped quote terminates the value and returns the parent state.
  */
-internal class QuotedLeafNodeState(private val parent: ParentState) : State()
+internal class QuotedLeafNodeState(
+        private val parent: ParentState,
+        private val startLine: Int,
+        private val startColumn: Int
+) : State()
 {
     private val value = StringBuilder()
     private val escaped = Escaped()
@@ -35,14 +40,11 @@ internal class QuotedLeafNodeState(private val parent: ParentState) : State()
     override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int) : State {
         return when(type) {
             CodePointType.QUOTE -> {
-                parent.push(value.toString().asNode())
+                parent.push(LeafNode(value.toString(), Region(startLine, startColumn, line, column)))
                 parent
             }
             CodePointType.ESCAPE -> escaped
-            else -> {
-                value.appendCodePoint(codePoint)
-                this
-            }
+            else -> { value.appendCodePoint(codePoint); this}
         }
     }
 
@@ -50,6 +52,7 @@ internal class QuotedLeafNodeState(private val parent: ParentState) : State()
         override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
             value.appendCodePoint(codePoint)
             return this@QuotedLeafNodeState
+
         }
     }
 }

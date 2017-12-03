@@ -22,17 +22,31 @@ package com.github.rimasu.node.decoder
 
 import com.github.rimasu.node.types.ListNode
 import com.github.rimasu.node.types.Node
+import com.github.rimasu.node.types.StructNode
 import com.github.rimasu.node.types.asNode
 
 
-class ListNodeContent {
+interface ListNodeContent {
+    fun add(data: Node)
+
+    fun add(data: String) {
+        add(data.asNode())
+    }
+}
+
+interface StructNodeContent {
+    fun add(label: String, data: Node)
+
+    fun add(label: String, data: String) {
+        add(label, data.asNode())
+    }
+}
+
+internal class ListNodeBuilder : ListNodeContent {
+
     private val nodes = mutableListOf<Node>()
 
-    infix fun add(data: String) = apply {
-        nodes.add(data.asNode())
-    }
-
-    infix fun add(data: Node) = apply {
+    override fun add(data: Node) {
         nodes.add(data)
     }
 
@@ -41,11 +55,29 @@ class ListNodeContent {
     }
 }
 
+internal class StructNodeBuilder : StructNodeContent {
+
+    private val nodes = mutableMapOf<String, Node>()
+
+    override fun add(label: String, data: Node) {
+        nodes[label] = data
+    }
+
+    fun build() : Node {
+        return StructNode(nodes)
+    }
+}
 
 
 
 fun listNode(init: ListNodeContent.() -> Unit) : Node {
-    val bld = ListNodeContent()
+    val bld = ListNodeBuilder()
+    bld.init()
+    return bld.build()
+}
+
+fun structNode(init: StructNodeContent.() -> Unit) : Node {
+    val bld = StructNodeBuilder()
     bld.init()
     return bld.build()
 }

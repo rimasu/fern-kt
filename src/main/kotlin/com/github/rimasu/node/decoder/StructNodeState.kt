@@ -22,13 +22,18 @@ package com.github.rimasu.node.decoder
 
 import com.github.rimasu.node.types.Node
 import com.github.rimasu.node.types.StructNode
+import com.github.rimasu.text.Region
 
 /**
  * State that creates a [StructNode]. Contains three sub-states that manage
  * parsing the field name, the equals sign and the values. A close struct
  * terminates the state and returns the parent state.
  */
-internal class StructNodeState(private val parent: ParentState) : ParentState()
+internal class StructNodeState(
+        private val parent: ParentState,
+        private val startLine: Int,
+        private val startColumn: Int
+) : ParentState()
 {
     private val nodes = mutableMapOf<String, Node>()
     private val inField = FieldNameState()
@@ -42,14 +47,14 @@ internal class StructNodeState(private val parent: ParentState) : ParentState()
     override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
         return when(type) {
             CodePointType.NORMAL -> inField.push(type, codePoint, line, column)
-            CodePointType.CLOSE_STRUCT -> finishStruct()
+            CodePointType.CLOSE_STRUCT -> finishStruct(line, column)
             CodePointType.WHITE_SPACE -> this
             else -> ErrorState(line, column)
         }
     }
 
-    private fun finishStruct(): State {
-        parent.push(StructNode(nodes))
+    private fun finishStruct(endLine: Int, endColumn: Int): State {
+        parent.push(StructNode(nodes, Region(startLine, startColumn, endLine, endColumn)))
         return parent
     }
 
@@ -99,10 +104,10 @@ internal class StructNodeState(private val parent: ParentState) : ParentState()
     private inner class PostAssign : State() {
         override fun push(type: CodePointType, codePoint: Int, line: Int, column: Int): State {
             return when(type) {
-                CodePointType.NORMAL ->  LeafNodeState(this@StructNodeState).push(type, codePoint, line, column)
-                CodePointType.QUOTE -> QuotedLeafNodeState(this@StructNodeState)
-                CodePointType.OPEN_STRUCT -> StructNodeState(this@StructNodeState)
-                CodePointType.OPEN_LIST -> ListNodeState(this@StructNodeState)
+                CodePointType.NORMAL ->  LeafNodeState(this@StructNodeState, line, column).push(type, codePoint, line, column)
+                CodePointType.QUOTE -> QuotedLeafNodeState(this@StructNodeState, line, column)
+                CodePointType.OPEN_STRUCT -> StructNodeState(this@StructNodeState, line, column)
+                CodePointType.OPEN_LIST -> ListNodeState(this@StructNodeState, line, column)
                 CodePointType.WHITE_SPACE -> this
                 else -> ErrorState(line, column)
             }

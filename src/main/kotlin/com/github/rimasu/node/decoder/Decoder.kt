@@ -20,8 +20,28 @@
  */
 package com.github.rimasu.node.decoder
 
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
 import com.github.rimasu.node.decoder.CodePointType.*
 import com.github.rimasu.node.types.*
+
+object Decoder {
+
+    fun parse(s: String) : Result<Node, Unit> {
+        val root = RootState()
+        var state: State = root
+        s.codePoints().forEach {
+            val type = CodePointType.classify(it)
+            state = state.push(type, it)
+        }
+        return if (state === root) {
+            Ok(root.value)
+        } else {
+            Err(Unit)
+        }
+    }
+}
 
 internal abstract class State {
     abstract fun push(type: CodePointType, codePoint: Int) : State

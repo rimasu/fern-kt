@@ -30,7 +30,7 @@ import com.github.rimasu.node.types.asNode
 import com.winterbe.expekt.should
 import org.junit.jupiter.api.Test
 
-class ParserMachineTest {
+class DecoderTest {
 
     @Test
     fun parse1() {
@@ -38,10 +38,8 @@ class ParserMachineTest {
                 Ok(
                         ListNode(emptyList())
                 )
-
         )
     }
-
 
     @Test
     fun parse2() {
@@ -183,17 +181,6 @@ class ParserMachineTest {
     }
 
     private fun parse(s: String): Result<Node, Unit> {
-        val root = RootState()
-        var state: State = root
-        s.codePoints().forEach {
-            val type = CodePointType.classify(it)
-            state = state.push(type, it)
-            // println("$state")
-        }
-        return if (state === root) {
-            Ok(root.value)
-        } else {
-            Err(Unit)
-        }
+        return Decoder.parse(s)
     }
 }

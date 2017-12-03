@@ -35,6 +35,16 @@ class RegionTest {
     }
 
     @Test
+    fun `can construct directly`() {
+        val start = Position(1,4)
+        val end = Position(4, 5)
+        val region = Region(1,4,4,5)
+        region.start.should.equal(start)
+        region.end.should.equal(end)
+    }
+
+
+    @Test
     fun `to string does not repeat line if the same`() {
         Region(
                 Position(1,10),

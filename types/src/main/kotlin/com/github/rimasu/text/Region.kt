@@ -28,6 +28,9 @@ data class Region(
         val end: Position
 ) {
 
+    constructor(startLine: Int, startColumn: Int, endLine: Int, endColumn: Int) :
+        this(Position(startLine, startColumn), Position(endLine, endColumn))
+
     override fun toString() = when {
             start == end -> start.toString()
             start.line == end.line -> "$start->${end.column}"

@@ -1,0 +1,52 @@
+buildscript {
+    ext.kotlin_version = '1.2.0'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0'
+        classpath 'gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+plugins {
+    id 'com.palantir.git-version' version '0.8.0'
+    id "com.github.hierynomus.license" version "0.14.0"
+}
+
+
+
+ext {
+    rootProjectDir = "${projectDir}"
+    gradleDir = "${projectDir}/gradle/common"
+    vcsDetails = versionDetails()
+}
+
+apply from: "$gradleDir/kotlin.gradle"
+apply from: "$gradleDir/common-compile-deps.gradle"
+apply from: "$gradleDir/ivy-publish-jar.gradle"
+apply from: "$gradleDir/maven-publish-jar.gradle"
+
+version "${vcsDetails.getLastTag()}.${vcsDetails.getCommitDistance()}"
+
+if (!project.hasProperty("publication_url")) {
+	ext.publication_url = "${rootProjectDir}/build/ivy"
+}
+
+dependencies {
+	compile "com.github.rimasu.node:node-types:0.0.41"
+
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}

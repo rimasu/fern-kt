@@ -30,8 +30,7 @@ The basic types are all implemented in the 'types' sub-model.
 
 1) Node: Sealed class that defines the interface for nodes.
 
-2) Null Node: A empty node. This is not modelled as a object, so that it
-can stored its location in the tree of nodes.
+2) Null Node: A empty node.
 
 3) Leaf Node: Stores small data types. Internally all types are stored as strings
 

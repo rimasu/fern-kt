@@ -189,6 +189,10 @@ class StructNode(values: Map<String, Node>, override val anchor: Region? = null)
         }
     }
 
+    fun getOptional(label: String) : Node? {
+        return values[label]
+    }
+
     override fun asStruct() = Ok(this)
 
     override fun toString(): String {

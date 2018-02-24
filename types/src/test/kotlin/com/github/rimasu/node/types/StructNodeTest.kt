@@ -23,6 +23,8 @@ package com.github.rimasu.node.types
 import com.winterbe.expekt.should
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class StructNodeTest : NodeTest() {
 
@@ -151,6 +153,16 @@ class StructNodeTest : NodeTest() {
     }
 
     @Nested
+    inner class `when getting an optional node using undefined label` {
+        private val result = ABC.getOptional("UNDEFINED")
+
+        @Test
+        fun `then result should be null`() {
+            assertNull(result)
+        }
+    }
+
+    @Nested
     inner class `when getting node using a defined label` {
 
         private val result = ABC["a"]
@@ -160,6 +172,16 @@ class StructNodeTest : NodeTest() {
             assertOk(result) {
                 it.should.equal(A)
             }
+        }
+    }
+
+    @Nested
+    inner class `when getting an optional node using a defined label` {
+        private val result = ABC.getOptional("a")
+
+        @Test
+        fun `then result is value`() {
+            assertEquals(A, result)
         }
     }
 }

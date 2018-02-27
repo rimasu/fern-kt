@@ -20,51 +20,59 @@
  */
 package com.github.rimasu.text
 
-import com.winterbe.expekt.should
-import org.junit.jupiter.api.Test
+import org.junit.Test
+import kotlin.test.assertEquals
+
 
 class RegionTest {
 
     @Test
-    fun `can get line and column`() {
-        val start = Position(1,4)
+    fun canGetStartAndEnd() {
+        val start = Position(1, 4)
         val end = Position(4, 5)
         val region = Region(start, end)
-        region.start.should.equal(start)
-        region.end.should.equal(end)
+        assertEquals(start, region.start)
+        assertEquals(end, region.end)
     }
 
     @Test
-    fun `can construct directly`() {
-        val start = Position(1,4)
+    fun canConstructDirectly() {
+        val start = Position(1, 4)
         val end = Position(4, 5)
-        val region = Region(1,4,4,5)
-        region.start.should.equal(start)
-        region.end.should.equal(end)
+        val region = Region(1, 4, 4, 5)
+        assertEquals(start, region.start)
+        assertEquals(end, region.end)
     }
 
 
     @Test
-    fun `to string does not repeat line if the same`() {
-        Region(
-                Position(1,10),
-                Position(1, 15)
-        ).toString().should.equal("1,10->15")
+    fun toStringDoesNotRepeatLineIfTheSame() {
+        assertEquals("1,10->15",
+                Region(
+                        Position(1, 10),
+                        Position(1, 15)
+                ).toString()
+        )
     }
 
     @Test
-    fun `to string does not repeat pos line and pos if the same`() {
-        Region(
-                Position(1,10),
-                Position(1, 10)
-        ).toString().should.equal("1,10")
+    fun toStringDoesNotRepeatLineAndPosIfTheSame() {
+        assertEquals("1,10",
+                Region(
+                        Position(1, 10),
+                        Position(1, 10)
+                ).toString()
+        )
     }
 
+
     @Test
-    fun `to string includes line numbers if the different`() {
-        Region(
-                Position(1,10),
-                Position(2, 15)
-        ).toString().should.equal("1,10->2,15")
+    fun toStringDoesRepeatLineAndPosIfTheDifferent() {
+        assertEquals("1,10->2,15",
+                Region(
+                        Position(1, 10),
+                        Position(2, 15)
+                ).toString()
+        )
     }
 }

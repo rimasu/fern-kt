@@ -20,57 +20,85 @@
  */
 package com.github.rimasu.node.types
 
-import com.winterbe.expekt.should
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
+import com.github.michaelbull.result.expectError
+import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import kotlin.test.fail
 
 class NullNodeTest : NodeTest() {
-
-    override val node = NullNode()
-
-    @Test
-    fun `to string contains equals _`() {
-        NullNode().toString().should.equal("_")
+    
+    companion object {
+        private val NULL_NODE = NullNode()
     }
 
+    override fun createNode() = NullNode()
+
     @Test
-    fun `null nodes are equal`() {
+    fun toStringEqualsUnderscore() {
+        assertEquals("_", NullNode().toString())
+    }
+    
+    @Test
+    fun nullNodesAreEqual() {
         val first = NullNode()
         val second = NullNode()
-        first.should.equal(second)
+        assertEquals(first, second)
     }
 
     @Test
-    fun `null nodes have same hash code`() {
+    fun nullNodesHaveSameHashCode() {
         val first = NullNode().hashCode()
         val second = NullNode().hashCode()
-        first.should.equal(second)
+        assertEquals(first, second)
     }
 
-    @Nested
-    inner class `when getting null node value as string`  : WhenGettingNodeAsString(node) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
-
+    @Test
+    fun gettingNullNodeAsStringFails() {
+        val error = NULL_NODE.asString().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting null node value as int`  : WhenGettingNodeAsInt(node) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingNullNodeAsIntegerFails() {
+        val error = NULL_NODE.asInt().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting null node value as struct`  : WhenGettingNodeAsStruct(node) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingNullNodeAsLongFails() {
+        val error = NULL_NODE.asLong().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting null node value as list`  : WhenGettingNodeAsList(node) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingNullNodeAsFloatFails() {
+        val error = NULL_NODE.asFloat().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
+    @Test
+    fun gettingNullNodeAsDoubleFails() {
+        val error = NULL_NODE.asDouble().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
+    }
+
+    @Test
+    fun gettingNullNodeAsBooleanFails() {
+        val error = NULL_NODE.asBoolean().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
+    }
+
+    @Test
+    fun gettingNullNodeAsListFails() {
+        val error = NULL_NODE.asList().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
+    }
+
+    @Test
+    fun gettingNullNodeAsStructWorks() {
+        val error = NULL_NODE.asStruct().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
+    }
 }
 

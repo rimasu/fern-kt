@@ -20,9 +20,13 @@
  */
 package com.github.rimasu.node.types
 
-import com.winterbe.expekt.should
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
+import com.github.michaelbull.result.expectError
+import com.github.michaelbull.result.getOrElse
+import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
+import kotlin.test.fail
 
 class LeafNodeTest : NodeTest() {
 
@@ -35,122 +39,111 @@ class LeafNodeTest : NodeTest() {
         private val FALSE_VALUE = false
         private val STRING_WITH_INTEGER_CONTENT = INTEGER_VALUE.toString()
         private val STRING_WITH_NON_INTEGER_CONTENT = "Some non-integer text"
+        val INT_NODE = STRING_WITH_INTEGER_CONTENT.asNode()
+        val STRING_NODE = STRING_WITH_NON_INTEGER_CONTENT.asNode()
     }
 
-    val INT_NODE = STRING_WITH_INTEGER_CONTENT.asNode()
-    val STRING_NODE = STRING_WITH_NON_INTEGER_CONTENT.asNode()
-
-    override val node = INT_NODE
+    override fun createNode() = STRING_WITH_INTEGER_CONTENT.asNode()
 
     @Test
-    fun `leaf node with same string content are equal`() {
+    fun leafNodesWithSameStringContentAreEqual() {
         val first = INTEGER_VALUE.asNode()
         val second = INTEGER_VALUE.toString().asNode()
-        first.should.equal(second)
+        assertEquals(first, second)
     }
 
     @Test
-    fun `leaf nodes with different string content are not equal`() {
-        val first = "a".asNode()
-        val second = "b".asNode()
-        first.should.not.equal(second)
+    fun leafNodesWithDifferentStringContentNotAreEqual() {
+        val first = STRING_WITH_NON_INTEGER_CONTENT.asNode()
+        val second = INTEGER_VALUE.toString().asNode()
+        assertNotEquals(first, second)
     }
 
     @Test
     fun toStringIsValue() {
-        INT_NODE.toString().should.equal(STRING_WITH_INTEGER_CONTENT)
-        STRING_NODE.toString().should.equal(STRING_WITH_NON_INTEGER_CONTENT)
+        assertEquals(STRING_WITH_INTEGER_CONTENT, INT_NODE.toString())
+        assertEquals(STRING_WITH_NON_INTEGER_CONTENT, STRING_NODE.toString())
     }
 
-    @Nested
-    inner class `when getting leaf node with integer content as string`  : WhenGettingNodeAsString(INT_NODE) {
-        @Test
-        fun `then result is ok`() = assertValueRetrieved(STRING_WITH_INTEGER_CONTENT)
+    @Test
+    fun gettingLeafNodeWithIntegerContentAsStringWorks() {
+        assertEquals(STRING_WITH_INTEGER_CONTENT, INT_NODE.asString().getOrElse { fail() })
     }
 
-    @Nested
-    inner class `when getting leaf node with non-integer content as string`  : WhenGettingNodeAsString(STRING_NODE) {
-        @Test
-        fun `then result is ok`() = assertValueRetrieved(STRING_WITH_NON_INTEGER_CONTENT)
+    @Test
+    fun gettingLeafNodeWithNonIntegerContentAsStringWorks() {
+        assertEquals(STRING_WITH_NON_INTEGER_CONTENT, STRING_NODE.asString().getOrElse { fail() })
     }
 
-    @Nested
-    inner class `when getting leaf node with integer content as integer`  : WhenGettingNodeAsInt(INTEGER_VALUE.asNode()) {
-        @Test
-        fun `then result is ok`() = assertValueRetrieved(INTEGER_VALUE)
+    @Test
+    fun gettingLeafNodeWithIntegerContentAsIntegerWorks() {
+        assertEquals(INTEGER_VALUE, INTEGER_VALUE.asNode().asInt().getOrElse { fail() })
     }
 
-    @Nested
-    inner class `when getting leaf node with long content as long`  : WhenGettingNodeAsLong(LONG_VALUE.asNode()) {
-        @Test
-        fun `then result is ok`() = assertValueRetrieved(LONG_VALUE)
+    @Test
+    fun gettingLeafNodeWithNonIntegerContentAsIntegerFails() {
+        val error = STRING_NODE.asInt().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting leaf node with non-long content as long`  : WhenGettingNodeAsLong(STRING_NODE) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingLeafNodeWithLongContentAsLongWorks() {
+        assertEquals(LONG_VALUE, LONG_VALUE.asNode().asLong().getOrElse { fail() })
     }
 
-    @Nested
-    inner class `when getting leaf node with float content as float`  : WhenGettingNodeAsFloat(FLOAT_VALUE.asNode()) {
-        @Test
-        fun `then result is ok`() = assertValueRetrieved(FLOAT_VALUE)
+    @Test
+    fun gettingLeafNodeWithNonLongContentAsLongFails() {
+        val error = STRING_NODE.asLong().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting leaf node with non-float content as float`  : WhenGettingNodeAsFloat(STRING_NODE) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingLeafNodeWithFloatContentAsFloatWorks() {
+        assertEquals(FLOAT_VALUE, FLOAT_VALUE.asNode().asFloat().getOrElse { fail() })
     }
 
-    @Nested
-    inner class `when getting leaf node with double content as double`  : WhenGettingNodeAsDouble(DOUBLE_VALUE.asNode()) {
-        @Test
-        fun `then result is ok`() = assertValueRetrieved(DOUBLE_VALUE)
+    @Test
+    fun gettingLeafNodeWithNonFloatContentAsFloatFails() {
+        val error = STRING_NODE.asFloat().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting leaf node with non-double content as double`  : WhenGettingNodeAsDouble(STRING_NODE) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingLeafNodeWithDoubleContentAsDoubleWorks() {
+        assertEquals(DOUBLE_VALUE, DOUBLE_VALUE.asNode().asDouble().getOrElse { fail() })
     }
 
-    @Nested
-    inner class `when getting leaf node with true content as boolean`  : WhenGettingNodeAsBoolean(TRUE_VALUE.asNode()) {
-        @Test
-        fun `then result is ok`() = assertValueRetrieved(true)
+    @Test
+    fun gettingLeafNodeWithNonDoubleContentAsDoubleFails() {
+        val error = STRING_NODE.asDouble().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting leaf node with false content as boolean`  : WhenGettingNodeAsBoolean(FALSE_VALUE.asNode()) {
-        @Test
-        fun `then result is ok`() = assertValueRetrieved(false)
+    @Test
+    fun gettingLeafNodeWithTrueContentAsBooleanWorks() {
+        assertEquals(true, TRUE_VALUE.asNode().asBoolean().getOrElse { fail() })
     }
 
-    @Nested
-    inner class `when getting leaf node with non-boolean content as boolean`  : WhenGettingNodeAsBoolean(FLOAT_VALUE.asNode()) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingLeafNodeWithFalseContentAsBooleanWorks() {
+        assertEquals(false, FALSE_VALUE.asNode().asBoolean().getOrElse { fail() })
     }
 
-    @Nested
-    inner class `when getting leaf node with non-integer content as integer`  : WhenGettingNodeAsInt(STRING_NODE) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingLeafNodeWithNonBooleanContentAsBooleanFails() {
+        val error = STRING_NODE.asBoolean().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-
-    @Nested
-    inner class `when getting leaf node as struct`  : WhenGettingNodeAsStruct(INT_NODE) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingLeafNodeAsStructFails() {
+        val error = STRING_NODE.asStruct().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting leaf node as list`  : WhenGettingNodeAsList(INT_NODE) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingLeafNodeAsListFails() {
+        val error = STRING_NODE.asList().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
-
 }

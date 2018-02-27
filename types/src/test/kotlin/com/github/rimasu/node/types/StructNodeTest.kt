@@ -20,168 +20,127 @@
  */
 package com.github.rimasu.node.types
 
-import com.winterbe.expekt.should
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
+import com.github.michaelbull.result.expect
+import com.github.michaelbull.result.expectError
+import org.junit.Test
+import kotlin.test.*
 
 class StructNodeTest : NodeTest() {
 
-    private val EMPTY = StructNode(emptyMap())
+    private companion object {
+        private val EMPTY = StructNode(emptyMap())
 
-    private val A = "a".asNode()
-    private val B = "b".asNode()
-    private val C = "c".asNode()
+        private val A = "a".asNode()
+        private val B = "b".asNode()
+        private val C = "c".asNode()
 
-    private val ABC = StructNode(mapOf(
-            "a" to A,
-            "b" to B,
-            "c" to C
-    ))
+        private val ABC = StructNode(mapOf(
+                "a" to A,
+                "b" to B,
+                "c" to C
+        ))
+    }
 
-    override val node = EMPTY
+    override fun createNode() = StructNode(emptyMap())
 
     @Test
-    fun `to string contains members`() {
-        ABC.toString().should.equal("{a=a b=b c=c}")
+    fun toStringContainsMembers() {
+        assertEquals("{a=a b=b c=c}", ABC.toString())
     }
 
     @Test
-    fun `struct nodes with same content are equal`() {
+    fun structNodesWithSameContentAreEqual() {
         val first = StructNode(mapOf("a" to "a".asNode()))
         val second = StructNode(mapOf("a" to "a".asNode()))
-        first.should.equal(second)
+        assertEquals(first, second)
     }
 
-
     @Test
-    fun `struct nodes with same content have same hash code`() {
+    fun structNodesWithSameContentHaveSameHashCode() {
         val first = StructNode(mapOf("a" to "a".asNode())).hashCode()
         val second = StructNode(mapOf("a" to "a".asNode())).hashCode()
-        first.should.equal(second)
+        assertEquals(first, second)
     }
 
     @Test
-    fun `struct nodes with different content are not equal`() {
+    fun structNodesWithDifferentContentAreNotEqual() {
         val first = StructNode(mapOf("a" to "b".asNode()))
         val second = StructNode(mapOf("a" to "a".asNode()))
-        first.should.not.equal(second)
+        assertNotEquals(first, second)
     }
 
     @Test
-    fun `struct nodes with different content have different hash codes`() {
+    fun structNodesWithDifferentContentHaveDifferentHashCode() {
         val first = StructNode(mapOf("a" to "b".asNode())).hashCode()
         val second = StructNode(mapOf("a" to "a".asNode())).hashCode()
-        first.should.not.equal(second)
+        assertNotEquals(first, second)
     }
 
-    @Nested
-    inner class `when getting struct node as string`  : WhenGettingNodeAsString(EMPTY) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingStructNodeAsStringFails() {
+        val error = EMPTY.asString().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting struct node as integer`  : WhenGettingNodeAsInt(EMPTY) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingStructNodeAsIntegerFails() {
+        val error = EMPTY.asInt().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-
-    @Nested
-    inner class `when getting struct node as long`  : WhenGettingNodeAsLong(EMPTY) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingStructNodeAsLongFails() {
+        val error = EMPTY.asLong().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-
-    @Nested
-    inner class `when getting struct node as float`  : WhenGettingNodeAsFloat(EMPTY) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingStructNodeAsFloatFails() {
+        val error = EMPTY.asFloat().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-
-    @Nested
-    inner class `when getting struct node as double`  : WhenGettingNodeAsDouble(EMPTY) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingStructNodeAsDoubleFails() {
+        val error = EMPTY.asDouble().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting struct node as boolean`  : WhenGettingNodeAsBoolean(EMPTY) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingStructNodeAsBooleanFails() {
+        val error = EMPTY.asBoolean().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-
-
-    @Nested
-    inner class `when getting struct node as struct`  : WhenGettingNodeAsStruct(EMPTY) {
-        @Test
-        fun `then result is ok`() = assertValueRetrieved(EMPTY)
+    @Test
+    fun gettingStructNodeAsListFails() {
+        val error = EMPTY.asList().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting struct node as list`  : WhenGettingNodeAsList(EMPTY) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingStructNodeAsStructWorks() {
+        assertEquals(EMPTY, EMPTY.asStruct().expect { fail() })
     }
 
-
-    @Nested
-    inner class `when getting node using undefined label` {
-
-        private val result = ABC["undefined"]
-
-        @Test
-        fun `then result is undefined value`() {
-            assertErr(result) {
-                it.should.be.instanceof(UndefinedValue::class.java)
-            }
-        }
-
-        @Test
-        fun `then result recorded path`() {
-            assertErr(result) {
-                if (it is UndefinedValue) {
-                    it.path.should.equal(Path(listOf(LabelStep("undefined"))))
-                }
-            }
-        }
+    @Test
+    fun gettingUndefinedMemberFails() {
+        val result = ABC["undefined"].expectError { fail() } as UndefinedValue
+        assertEquals(Path(listOf(LabelStep("undefined"))), result.path)
     }
 
-    @Nested
-    inner class `when getting an optional node using undefined label` {
-        private val result = ABC.getOptional("UNDEFINED")
-
-        @Test
-        fun `then result should be null`() {
-            assertNull(result)
-        }
+    @Test
+    fun gettingDefinedMemberWorks() {
+        assertEquals(A, ABC["a"].expect { fail() })
     }
 
-    @Nested
-    inner class `when getting node using a defined label` {
-
-        private val result = ABC["a"]
-
-        @Test
-        fun `then result is ok`() {
-            assertOk(result) {
-                it.should.equal(A)
-            }
-        }
+    @Test
+    fun gettingOptionalUndefinedReturnsNull() {
+        assertNull(ABC.getOptional("UNDEFINED"))
     }
 
-    @Nested
-    inner class `when getting an optional node using a defined label` {
-        private val result = ABC.getOptional("a")
-
-        @Test
-        fun `then result is value`() {
-            assertEquals(A, result)
-        }
+    @Test
+    fun gettingOptionalDefinedReturnsValue() {
+        assertEquals(A, ABC.getOptional("a"))
     }
 }

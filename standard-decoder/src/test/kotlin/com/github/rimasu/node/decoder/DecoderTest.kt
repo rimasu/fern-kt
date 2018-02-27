@@ -28,479 +28,516 @@ import com.github.rimasu.node.types.StructNode
 import com.github.rimasu.node.types.asNode
 import com.github.rimasu.text.Position
 import com.github.rimasu.text.Region
-import com.winterbe.expekt.should
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
+import org.junit.Test
+import kotlin.test.assertEquals
 import kotlin.test.fail
 
 class DecoderTest {
 
-    @Nested
-    inner class ParseEmptyListAtBeginningOfDocument: ParseOk(
-            text = "[]"
-    ) {
-        override fun checkNode(value: Node) {
-            value.should.equal(listNode {})
-            value.anchor.should.equal(Region(1,1,1,2))
+    private lateinit var text: String
+    private lateinit var result: Result<Node, DecoderError>
+
+    private fun givenText(text: String) {
+        this.text = text
+    }
+
+    private fun whenDecoded() {
+        result = Decoder.parse(text)
+    }
+
+    private fun checkNode(func: (Node) -> Unit) {
+        val actual = result.getOrElse { fail(it.toString()) }
+        func(actual)
+    }
+
+    private fun thenParseFailsWith(expectedPosition: Position,
+                                   expectedTypes: List<CodePointType> = emptyList()) {
+        val actual = result.getErrorOrElse { fail(it.toString()) }
+        assertEquals(expectedPosition, actual.position)
+        when (actual) {
+            is InvalidSyntax -> assertEquals(expectedTypes, actual.expectedTypes)
         }
     }
 
-    @Nested
-    inner class ParseEmptyListAtBeginningOfDocumentWithLeadingWhiteSpace: ParseOk(
-            text = "\n []"
-    ) {
-        override fun checkNode(value: Node) {
-            value.should.equal(listNode {})
-            value.anchor.should.equal(Region(2,2,2,3))
+    @Test
+    fun emptyListAtBeginningOfDocument() {
+        givenText("[]")
+        whenDecoded()
+        checkNode { value ->
+            assertEquals(listNode {}, value)
+            assertEquals(Region(1, 1, 1, 2), value.anchor)
         }
     }
 
-    @Nested
-    inner class ParseEmptyListAtBeginningOfDocumentWithIntermediateWhiteSpace: ParseOk(
-            text = "[\n ]"
-    ) {
-        override fun checkNode(value: Node) {
-            value.should.equal(listNode {})
-            value.anchor.should.equal(Region(1, 1, 2, 2))
+    @Test
+    fun emptyListAtBeginningOfDocumentWithLeadingWhiteSpace() {
+        givenText("\n []")
+        whenDecoded()
+        checkNode { value ->
+            assertEquals(listNode {}, value)
+            assertEquals(Region(2, 2, 2, 3), value.anchor)
         }
     }
 
-    @Nested
-    inner class ParseUnquotedValueInList: ParseOk(
-            text = "[abcd]"
-    ) {
-        override fun checkNode(value: Node) {
-            value.should.equal(listNode { add("abcd") })
-            value.anchor.should.equal(Region(1, 1, 1, 6))
+    @Test
+    fun emptyListAtBeginningOfDocumentWithIntermediateWhiteSpace() {
+        givenText("[\n ]")
+        whenDecoded()
+        checkNode { value ->
+            assertEquals(listNode {}, value)
+            assertEquals(Region(1, 1, 2, 2), value.anchor)
+        }
+    }
+
+    @Test
+    fun unquotedValueInList() {
+        givenText("[abcd]")
+        whenDecoded()
+        checkNode { value ->
+            assertEquals(listNode { add("abcd") }, value)
+            assertEquals(Region(1, 1, 1, 6), value.anchor)
+        }
+
+        checkNode { value ->
             value as ListNode
-            with(value[1].expect{}) {
-                should.equal("abcd".asNode())
-                anchor.should.equal(Region(1, 2, 1, 5))
+            with(value[1].getOrElse { fail(it.toString()) }) {
+                assertEquals("abcd".asNode(), this)
+                assertEquals(Region(1, 2, 1, 5), this.anchor)
             }
         }
     }
 
-    @Nested
-    inner class ParseUnquotedValuesInList: ParseOk(
-            text = "[abcd efgh]"
-    ) {
-        override fun checkNode(value: Node) {
-            value.should.equal(listNode { add("abcd"); add("efgh") })
-            value.anchor.should.equal(Region(1, 1, 1, 11))
+    @Test
+    fun unquotedValuesInList() {
+        givenText("[abcd efgh]")
+        whenDecoded()
+
+        checkNode { value ->
+            assertEquals(listNode { add("abcd"); add("efgh") }, value)
+            assertEquals(Region(1, 1, 1, 11), value.anchor)
+        }
+
+        checkNode { value ->
+            value as ListNode
+            with(value[1].getOrElse { fail(it.toString()) }) {
+                assertEquals("abcd".asNode(), this)
+                assertEquals(Region(1, 2, 1, 5), this.anchor)
+            }
+
+            with(value[2].getOrElse { fail(it.toString()) }) {
+                assertEquals("efgh".asNode(), this)
+                assertEquals(Region(1, 7, 1, 10), this.anchor)
+            }
+        }
+    }
+
+    @Test
+    fun quotedValueInList() {
+        givenText("[\"abcd\"]")
+        whenDecoded()
+        checkNode { value ->
+            assertEquals(listNode { add("abcd".asNode()) }, value)
+            assertEquals(Region(1, 1, 1, 8), value.anchor)
 
             value as ListNode
-            with(value[1].expect{}) {
-                should.equal("abcd".asNode())
-                anchor.should.equal(Region(1, 2, 1, 5))
-            }
-
-            with(value[2].expect{}) {
-                should.equal("efgh".asNode())
-                anchor.should.equal(Region(1, 7, 1, 10))
+            with(value[1].getOrElse { fail(it.toString()) }) {
+                assertEquals("abcd".asNode(), this)
+                assertEquals(Region(1, 2, 1, 7), this.anchor)
             }
         }
     }
 
-    @Nested
-    inner class ParseQuotedValueInList: ParseOk(
-            text = "[\"abcd\"]"
-    ) {
-        override fun checkNode(value: Node) {
-            value.should.equal(listNode { add("abcd") })
-            value.anchor.should.equal(Region(1, 1, 1, 8))
+    @Test
+    fun quotedAndEscapedValueInList() {
+        givenText("[\"ab|\"cd\"]")
+        whenDecoded()
+        checkNode { value ->
+            assertEquals(listNode { add("ab\"cd") }, value)
+            assertEquals(Region(1, 1, 1, 10), value.anchor)
             value as ListNode
-            with(value[1].expect{}) {
-                should.equal("abcd".asNode())
-                anchor.should.equal(Region(1, 2, 1, 7))
+            with(value[1].getOrElse { fail(it.toString()) }) {
+                assertEquals("ab\"cd".asNode(), this)
+                assertEquals(Region(1, 2, 1, 9), this.anchor)
             }
         }
     }
 
-    @Nested
-    inner class ParseQuotedAndEscapedValueInList: ParseOk(
-            text = "[\"ab|\"cd\"]"
-    ) {
-        override fun checkNode(value: Node) {
-            value.should.equal(listNode { add("ab\"cd") })
-            value.anchor.should.equal(Region(1, 1, 1, 10))
+    @Test
+    fun quotedValuesInList() {
+        givenText("[\"abcd\" \"efgh\"]")
+        whenDecoded()
+        checkNode { value ->
+            assertEquals(listNode { add("abcd"); add("efgh") }, value)
+            assertEquals(Region(1, 1, 1, 15), value.anchor)
             value as ListNode
-            with(value[1].expect{}) {
-                should.equal("ab\"cd".asNode())
-                anchor.should.equal(Region(1, 2, 1, 9))
+            with(value[1].getOrElse { fail(it.toString()) }) {
+                assertEquals("abcd".asNode(), this)
+                assertEquals(Region(1, 2, 1, 7), this.anchor)
+            }
+            with(value[2].getOrElse { fail(it.toString()) }) {
+                assertEquals("efgh".asNode(), this)
+                assertEquals(Region(1, 9, 1, 14), this.anchor)
             }
         }
     }
 
-    @Nested
-    inner class ParseQuotedValuesInList: ParseOk(
-            text = "[\"abcd\" \"efgh\"]"
-    ) {
-        override fun checkNode(value: Node) {
-            value.should.equal(listNode { add("abcd"); add("efgh") })
-            value.anchor.should.equal(Region(1, 1, 1, 15))
+    @Test
+    fun listInList() {
+        givenText("[[]]")
+        whenDecoded()
+        checkNode { value ->
+            assertEquals(listNode { add(listNode {}) }, value)
+            assertEquals(Region(1, 1, 1, 4), value.anchor)
             value as ListNode
-            with(value[1].expect{}) {
-                should.equal("abcd".asNode())
-                anchor.should.equal(Region(1, 2, 1, 7))
-            }
-            with(value[2].expect{}) {
-                should.equal("efgh".asNode())
-                anchor.should.equal(Region(1, 9, 1, 14))
+            with(value[1].getOrElse { fail(it.toString()) }) {
+                assertEquals(listNode {}, this)
+                assertEquals(Region(1, 2, 1, 3), this.anchor)
             }
         }
     }
 
-    @Nested
-    inner class ParseListInList: ParseOk(
-            text = "[[]]"
-    ) {
-        override fun checkNode(value: Node) {
-            value.should.equal(listNode { add(listNode {}) })
-            value.anchor.should.equal(Region(1, 1, 1, 4))
+    @Test
+    fun structInList() {
+        givenText("[()]")
+        whenDecoded()
+        checkNode { value ->
+            assertEquals(listNode { add(structNode {}) }, value)
+            assertEquals(Region(1, 1, 1, 4), value.anchor)
             value as ListNode
-            with(value[1].expect{}) {
-                should.equal(listNode {})
-                anchor.should.equal(Region(1, 2, 1, 3))
+            with(value[1].getOrElse { fail(it.toString()) }) {
+                assertEquals(structNode {}, this)
+                assertEquals(Region(1, 2, 1, 3), this.anchor)
             }
         }
     }
 
-    @Nested
-    inner class ParseStructInList: ParseOk(
-            text = "[()]"
-    ) {
-        override fun checkNode(value: Node) {
-            value.should.equal(listNode { add(structNode {}) })
-            value.anchor.should.equal(Region(1, 1, 1, 4))
-            value as ListNode
-            with(value[1].expect{}) {
-                should.equal(structNode {})
-                anchor.should.equal(Region(1, 2, 1, 3))
-            }
+    @Test
+    fun structAtBeginningOfDocument() {
+        givenText("()")
+        whenDecoded()
+        checkNode { value ->
+            assertEquals(structNode {}, value)
+            assertEquals(Region(1, 1, 1, 2), value.anchor)
         }
     }
 
-
-    @Nested
-    inner class ParseEmptyStructAtBeginningOfDocument: ParseOk(
-            text = "()"
-    ) {
-        override fun checkNode(value: Node) {
-            value.should.equal(structNode {})
-            value.anchor.should.equal(Region(1,1,1,2))
+    @Test
+    fun emptyStructAtBeginningOfDocumentWithLeadingWhiteSpace() {
+        givenText("\n ()")
+        whenDecoded()
+        checkNode { value ->
+            assertEquals(structNode {}, value)
+            assertEquals(Region(2, 2, 2, 3), value.anchor)
         }
     }
 
-    @Nested
-    inner class ParseEmptyStructAtBeginningOfDocumentWithLeadingWhiteSpace: ParseOk(
-            text = "\n ()"
-    ) {
-        override fun checkNode(value: Node) {
-            value.should.equal(structNode {})
-            value.anchor.should.equal(Region(2,2,2,3))
+    @Test
+    fun emptyStructAtBeginningOfDocumentWithIntermediateWhiteSpace() {
+        givenText("(\n )")
+        whenDecoded()
+        checkNode { value ->
+            assertEquals(structNode {}, value)
+            assertEquals(Region(1, 1, 2, 2), value.anchor)
         }
     }
 
-    @Nested
-    inner class ParseEmptyStructAtBeginningOfDocumentWithIntermediateWhiteSpace: ParseOk(
-            text = "(\n )"
-    ) {
-        override fun checkNode(value: Node) {
-            value.should.equal(structNode {})
-            value.anchor.should.equal(Region(1, 1, 2, 2))
-        }
-    }
-
-    @Nested
-    inner class ParseUnquotedValuesInStruct: ParseOk(
-            text = "(a=1 b =2 c  =3 d= 4 e=  5)"
-    ) {
-        override fun checkNode(value: Node) {
-            value.should.equal(structNode {
+    @Test
+    fun unquotedValuesInStruct() {
+        givenText("(a=1 b =2 c  =3 d= 4 e=  5)")
+        whenDecoded()
+        checkNode { value ->
+            assertEquals(structNode {
                 add("a", "1")
                 add("b", "2")
                 add("c", "3")
                 add("d", "4")
                 add("e", "5")
-            })
-            value.anchor.should.equal(Region(1, 1, 1, 27))
+            }, value)
+            assertEquals(Region(1, 1, 1, 27), value.anchor)
 
             value as StructNode
-            with(value["a"].expect{}) {
-                should.equal("1".asNode())
-                anchor.should.equal(Region(1, 4, 1, 4))
+            with(value["a"].getOrElse { fail(it.toString()) }) {
+                assertEquals("1".asNode(), this)
+                assertEquals(Region(1, 4, 1, 4), this.anchor)
             }
 
-            with(value["b"].expect{}) {
-                should.equal("2".asNode())
-                anchor.should.equal(Region(1, 9, 1, 9))
+            with(value["b"].getOrElse { fail(it.toString()) }) {
+                assertEquals("2".asNode(), this)
+                assertEquals(Region(1, 9, 1, 9), this.anchor)
             }
 
-            with(value["c"].expect{}) {
-                should.equal("3".asNode())
-                anchor.should.equal(Region(1, 15, 1, 15))
+            with(value["c"].getOrElse { fail(it.toString()) }) {
+                assertEquals("3".asNode(), this)
+                assertEquals(Region(1, 15, 1, 15), this.anchor)
             }
 
-            with(value["d"].expect{}) {
-                should.equal("4".asNode())
-                anchor.should.equal(Region(1, 20, 1, 20))
+            with(value["d"].getOrElse { fail(it.toString()) }) {
+                assertEquals("4".asNode(), this)
+                assertEquals(Region(1, 20, 1, 20), this.anchor)
             }
 
-            with(value["e"].expect{}) {
-                should.equal("5".asNode())
-                anchor.should.equal(Region(1, 26, 1, 26))
+            with(value["e"].getOrElse { fail(it.toString()) }) {
+                assertEquals("5".asNode(), this)
+                assertEquals(Region(1, 26, 1, 26), this.anchor)
             }
         }
     }
 
-    @Nested
-    inner class ParseQuotedValuesInStruct: ParseOk(
-            text = "(a=\"1 \" b =\" 2\" )"
-    ) {
-        override fun checkNode(value: Node) {
-            value.should.equal(structNode {
+    @Test
+    fun quotedValuesInStruct() {
+        givenText("(a=\"1 \" b =\" 2\" )")
+        whenDecoded()
+        checkNode { value ->
+            assertEquals(structNode {
                 add("a", "1 ")
                 add("b", " 2")
-            })
-            value.anchor.should.equal(Region(1, 1, 1, 17))
+            }, value)
+            assertEquals(Region(1, 1, 1, 17), value.anchor)
 
             value as StructNode
-            with(value["a"].expect{}) {
-                should.equal("1 ".asNode())
-                anchor.should.equal(Region(1, 4, 1, 7))
+            with(value["a"].getOrElse { fail(it.toString()) }) {
+                assertEquals("1 ".asNode(), this)
+                assertEquals(Region(1, 4, 1, 7), this.anchor)
             }
 
-            with(value["b"].expect{}) {
-                should.equal(" 2".asNode())
-                anchor.should.equal(Region(1, 12, 1, 15))
+            with(value["b"].getOrElse { fail(it.toString()) }) {
+                assertEquals(" 2".asNode(), this)
+                assertEquals(Region(1, 12, 1, 15), this.anchor)
             }
         }
     }
 
-    @Nested
-    inner class ParseStructInStruct: ParseOk(
-            text = "(a=() )"
-    ) {
-        override fun checkNode(value: Node) {
-            value.should.equal(structNode {
+    @Test
+    fun structInStruct() {
+        givenText("(a=() )")
+        whenDecoded()
+        checkNode { value ->
+            assertEquals(structNode {
                 add("a", structNode {})
-            })
-            value.anchor.should.equal(Region(1, 1, 1, 7))
+            }, value)
+            assertEquals(Region(1, 1, 1, 7), value.anchor)
 
             value as StructNode
-            with(value["a"].expect{}) {
-                should.equal(structNode {})
-                anchor.should.equal(Region(1, 4, 1, 5))
+            with(value["a"].getOrElse { fail(it.toString()) }) {
+                assertEquals(structNode {}, this)
+                assertEquals(Region(1, 4, 1, 5), this.anchor)
             }
 
         }
     }
 
-    @Nested
-    inner class ParseListInStruct: ParseOk(
-            text = "(a=[] )"
-    ) {
-        override fun checkNode(value: Node) {
-            value.should.equal(structNode {
+    @Test
+    fun listInStruct() {
+        givenText("(a=[] )")
+        whenDecoded()
+        checkNode { value ->
+            assertEquals(structNode {
                 add("a", listNode {})
-            })
-            value.anchor.should.equal(Region(1, 1, 1, 7))
+            }, value)
+            assertEquals(Region(1, 1, 1, 7), value.anchor)
 
             value as StructNode
-            with(value["a"].expect{}) {
-                should.equal(listNode {})
-                anchor.should.equal(Region(1, 4, 1, 5))
-            }
-
-        }
-    }
-
-    @Nested
-    internal inner class ParsingQuotedValueAtRoot : ParseInvalidSyntax(
-            text="a",
-            expectedPosition = Position(1,1),
-            expectedTypes = listOf(OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
-    )
-
-    @Nested
-    internal inner class ParsingCloseStructInList : ParseInvalidSyntax(
-            text="[)",
-            expectedPosition = Position(1,2),
-            expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, CLOSE_LIST, WHITE_SPACE)
-    )
-
-    @Nested
-    internal inner class ParsingCloseStructInListWithIntermediateWhiteSpace : ParseInvalidSyntax(
-            text="[\n )",
-            expectedPosition = Position(2, 2),
-            expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, CLOSE_LIST, WHITE_SPACE)
-    )
-
-    @Nested
-    internal inner class ParsingIncompleteList : ParseUnexpectedEndOfInput(
-            text="[\n ",
-            expectedPosition = Position(2,1)
-    )
-
-    @Nested
-    internal inner class ParsingCloseListInStruct : ParseInvalidSyntax(
-            text="(]",
-            expectedPosition = Position(1,2),
-            expectedTypes = listOf(NORMAL, CLOSE_STRUCT, WHITE_SPACE)
-    )
-
-    @Nested
-    internal inner class ParsingCloseListInStructWithIntermediateWhiteSpace : ParseInvalidSyntax(
-            text="(\n ]",
-            expectedPosition = Position(2,2),
-            expectedTypes = listOf(NORMAL, CLOSE_STRUCT, WHITE_SPACE)
-    )
-
-    @Nested
-    internal inner class ParsingIncompleteStruct : ParseUnexpectedEndOfInput(
-            text="(\n ",
-            expectedPosition = Position(2,1)
-    )
-
-    @Nested
-    internal inner class ParsingIncompleteField : ParseUnexpectedEndOfInput(
-            text="( a \n ",
-            expectedPosition = Position(2,1)
-    )
-
-    @Nested
-    internal inner class ParsingOpenListBeforeField : ParseInvalidSyntax(
-            text="( ( ",
-            expectedPosition = Position(1,3),
-            expectedTypes = listOf(NORMAL, CLOSE_STRUCT, WHITE_SPACE)
-    )
-
-    @Nested
-    internal inner class ParsingOpenListDuringFieldName : ParseInvalidSyntax(
-            text="( a( ",
-            expectedPosition = Position(1,4),
-            expectedTypes = listOf(NORMAL, ASSIGNMENT, WHITE_SPACE)
-    )
-
-    @Nested
-    internal inner class ParsingOpenListBeforeAssignment : ParseInvalidSyntax(
-            text="( a ( ",
-            expectedPosition = Position(1,5),
-            expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
-    )
-
-    @Nested
-    internal inner class ParsingCloseStructBeforeAssignment : ParseInvalidSyntax(
-            text="( a ) ",
-            expectedPosition = Position(1,5),
-            expectedTypes =  listOf(ASSIGNMENT, WHITE_SPACE)
-    )
-
-    @Nested
-    internal inner class ParsingCloseStructAfterAssignment : ParseInvalidSyntax(
-            text="( a =)",
-            expectedPosition = Position(1,6),
-            expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
-    )
-
-    @Nested
-    internal inner class ParsingCloseStructAfterAssignmentWithIntermediateWhitespace : ParseInvalidSyntax(
-            text="( a = )\n ",
-            expectedPosition = Position(1,7),
-            expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
-    )
-
-    @Nested
-    internal inner class ParsingOpenStructBeforeAssignment : ParseInvalidSyntax(
-            text="( a [\"",
-            expectedPosition = Position(1,5),
-            expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
-    )
-
-    @Nested
-    internal inner class ParsingCloseListBeforeAssignment : ParseInvalidSyntax(
-            text="( a ]\n ",
-            expectedPosition = Position(1,5),
-            expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
-    )
-
-    @Nested
-    internal inner class ParsingCloseListAfterAssignment : ParseInvalidSyntax(
-            text="( a =]\n ",
-            expectedPosition = Position(1,6),
-            expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
-    )
-
-    @Nested
-    internal inner class ParsingCloseListAfterAssignmentWithIntermediateWhitespace : ParseInvalidSyntax(
-            text="( a = ]\n ",
-            expectedPosition = Position(1,7),
-            expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
-    )
-
-    @Nested
-    internal inner class ParsingUnquotedValueBeforeAssignment : ParseInvalidSyntax(
-            text="( a a\n ",
-            expectedPosition = Position(1,5),
-            expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
-    )
-
-    @Nested
-    internal inner class ParsingQuotedValueBeforeAssignment : ParseInvalidSyntax(
-            text="( a \" ",
-            expectedPosition = Position(1,5),
-            expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
-    )
-
-    abstract inner class ParseOk(text: String) {
-        private val node: Node = Decoder.parse(text).get() ?: fail("Unexpected failure")
-
-        @Test
-        fun resultIsOk() {
-           checkNode(node)
-        }
-
-        abstract fun checkNode(value: Node)
-    }
-
-    internal abstract inner class ParseInvalidSyntax(
-            text: String,
-            private val expectedPosition : Position,
-            private val expectedTypes: List<CodePointType>
-    ) {
-        private val error = Decoder.parse(text).getError() ?: fail("Unexpected success")
-
-        @Test
-        fun errorHasExpectedPosition() {
-            error.position.should.equal(expectedPosition)
-        }
-
-        @Test
-        fun errorHasCorrectExpectedCodeTypes() {
-            when(error) {
-                is InvalidSyntax ->  error.expectedTypes.should.equal(expectedTypes)
-                else -> fail("Expected syntax error")
+            with(value["a"].getOrElse { fail(it.toString()) }) {
+                assertEquals(listNode {}, this)
+                assertEquals(Region(1, 4, 1, 5), this.anchor)
             }
         }
     }
 
-    internal abstract inner class ParseUnexpectedEndOfInput(
-            text: String,
-            private val expectedPosition : Position
-    ) {
-        private val error = Decoder.parse(text).getError() ?: fail("Unexpected success")
+    @Test
+    fun quotedValueAtRoot() {
+        givenText("a")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(1, 1),
+                expectedTypes = listOf(OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
+        )
+    }
 
-        @Test
-        fun errorHasExpectedPosition() {
-            error.position.should.equal(expectedPosition)
-        }
+    @Test
+    fun closeStructInList() {
+        givenText("[)")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(1, 2),
+                expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, CLOSE_LIST, WHITE_SPACE)
+        )
+    }
 
-        @Test
-        fun errorIsCorrectType() {
-            when(error) {
-                is UnexpectedEndOfInput -> return
-                else -> fail("Expected unexpected end of input")
-            }
-        }
+    @Test
+    fun closeStructInListWithIntermediateWhiteSpace() {
+        givenText("[\n )")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(2, 2),
+                expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, CLOSE_LIST, WHITE_SPACE)
+        )
+    }
+
+    @Test
+    fun incompleteList() {
+        givenText("[\n ")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(2, 1)
+        )
+    }
+
+    @Test
+    fun closeListInStruct() {
+        givenText("(]")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(1, 2),
+                expectedTypes = listOf(NORMAL, CLOSE_STRUCT, WHITE_SPACE)
+        )
+    }
+
+    @Test
+    fun closeListInStructWithIntermediateWhiteSpace() {
+        givenText("(\n ]")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(2, 2),
+                expectedTypes = listOf(NORMAL, CLOSE_STRUCT, WHITE_SPACE)
+        )
+    }
+
+    @Test
+    fun IncompleteStruct() {
+        givenText("(\n ")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(2, 1)
+        )
+    }
+
+    @Test
+    fun incompleteField() {
+        givenText("( a \n ")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(2, 1)
+        )
+    }
+
+    @Test
+    fun openListBeforeField() {
+        givenText("( ( ")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(1, 3),
+                expectedTypes = listOf(NORMAL, CLOSE_STRUCT, WHITE_SPACE)
+        )
+    }
+
+    @Test
+    fun openListDuringFieldName() {
+        givenText("( a( ")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(1, 4),
+                expectedTypes = listOf(NORMAL, ASSIGNMENT, WHITE_SPACE)
+        )
+    }
+
+    @Test
+    fun openListBeforeAssignment() {
+        givenText("( a ( ")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(1, 5),
+                expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
+        )
+    }
+
+    @Test
+    fun closeStructBeforeAssignment() {
+        givenText("( a ) ")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(1, 5),
+                expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
+        )
+    }
+
+    @Test
+    fun closeStructAfterAssignment() {
+        givenText("( a =)")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(1, 6),
+                expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
+        )
+    }
+
+    @Test
+    fun closeStructAfterAssignmentWithIntermediateWhitespace() {
+        givenText("( a = )\n ")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(1, 7),
+                expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
+        )
+    }
+
+    @Test
+    fun openStructBeforeAssignment() {
+        givenText("( a [\"")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(1, 5),
+                expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
+        )
+    }
+
+    @Test
+    fun closeListBeforeAssignment() {
+        givenText("( a ]\n ")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(1, 5),
+                expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
+        )
+    }
+
+    @Test
+    fun closeListAfterAssignment() {
+        givenText("( a =]\n ")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(1, 6),
+                expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
+        )
+    }
+
+    @Test
+    fun closeListAfterAssignmentWithIntermediateWhitespace() {
+        givenText("( a = ]\n ")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(1, 7),
+                expectedTypes = listOf(NORMAL, QUOTE, OPEN_STRUCT, OPEN_LIST, WHITE_SPACE)
+        )
+    }
+
+    @Test
+    fun unquotedValueBeforeAssignment() {
+        givenText("( a a\n ")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(1, 5),
+                expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
+        )
+    }
+
+    @Test
+    fun quotedValueBeforeAssignment() {
+        givenText("( a \" ")
+        whenDecoded()
+        thenParseFailsWith(
+                expectedPosition = Position(1, 5),
+                expectedTypes = listOf(ASSIGNMENT, WHITE_SPACE)
+        )
     }
 }

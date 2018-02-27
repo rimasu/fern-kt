@@ -20,147 +20,153 @@
  */
 package com.github.rimasu.node.jacksondecoder
 
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.getErrorOrElse
+import com.github.michaelbull.result.getOrElse
 import com.github.rimasu.node.types.*
 import com.github.rimasu.text.Position
-import com.github.rimasu.text.Region
-import com.winterbe.expekt.should
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
+import org.junit.Test
 
+import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class JacksonDecoderTest {
 
-    @Nested
-    inner class WhenJsonTextIsEmptyStruct : SuccessfulParse(
-            jsonText = """{}""",
-            expectedNode = StructNode(emptyMap())
-    )
-
-    @Nested
-    inner class WhenJsonTextIsEmptyArray : SuccessfulParse(
-            jsonText = """[]""",
-            expectedNode = ListNode(emptyList())
-    )
-
-    @Nested
-    inner class WhenJsonTextIsPopulatedArray : SuccessfulParse(
-            jsonText = """["a",1,[],{}]""",
-            expectedNode = ListNode(
-                    listOf(
-                        "a".asNode(),
-                        1.asNode(),
-                        ListNode(emptyList()),
-                        StructNode(emptyMap())
-                    )
-            )
-    )
-
-    @Nested
-    inner class WhenJsonTextIsPopulatedStruct: SuccessfulParse(
-            jsonText = """{"a":"a","b":1,"c":[],"d":{}}""",
-            expectedNode = StructNode(
-                    mapOf(
-                            "a" to "a".asNode(),
-                            "b" to 1.asNode(),
-                            "c" to ListNode(emptyList()),
-                            "d" to StructNode(emptyMap())
-                    )
-            )
-    )
-
-    @Nested
-    inner class WhenJsonTextIsEmptyString : SuccessfulParse(
-            jsonText = "\"\"",
-            expectedNode = "".asNode()
-
-    )
-
-    @Nested
-    inner class WhenJsonTextIsPopulatedString : SuccessfulParse(
-            jsonText = "\"a\"",
-            expectedNode = "a".asNode()
-    )
-
-    @Nested
-    inner class WhenJsonTextIsInteger: SuccessfulParse(
-            jsonText = "456",
-            expectedNode = 456.asNode()
-    )
-
-    @Nested
-    inner class WhenJsonTextIsDouble : SuccessfulParse(
-            jsonText = "456.890",
-            expectedNode = 456.89.asNode()
-    )
-
-    @Nested
-    inner class WhenJsonTextIsTrue : SuccessfulParse(
-            jsonText = "true",
-            expectedNode = true.asNode()
-    )
-
-    @Nested
-    inner class WhenJsonTextIsFalse : SuccessfulParse(
-            jsonText = "false",
-            expectedNode = false.asNode()
-    )
-
-
-    @Nested
-    inner class WhenJsonTextIsNull : SuccessfulParse(
-            jsonText = "null",
-            expectedNode = NullNode()
-    )
-
-    @Nested
-    inner class WhenJsonTextIsEmpty : UnsuccessfulParse(
-            jsonText = "",
-            expectedPosition = Position(1, 1    )
-    )
-
-    @Nested
-    inner class WhenJsonTextIsIncompleteObject : UnsuccessfulParse(
-            jsonText = "{",
-            expectedPosition = Position(1, 2)
-    )
-
-    @Nested
-    inner class WhenJsonIsIncompleteArray : UnsuccessfulParse(
-            jsonText = "[",
-            expectedPosition = Position(1, 2)
-    )
-
-    open inner class SuccessfulParse(
-            jsonText: String,
-            private val expectedNode: Node
-    )
-    {
-        private val decoder = JacksonDecoder()
-        private val result = decoder.decode(jsonText)
-
-        @Test
-        fun `then parse was successful`() {
-            assertOk(result) {
-                it.should.equal(expectedNode)
-            }
-        }
+    @Test
+    fun isEmptyStruct() {
+        givenJson("""{}""")
+        whenDecoded()
+        thenDecodeSucceedsWith(
+                StructNode(emptyMap())
+        )
     }
 
+    @Test
+    fun isEmptyArray() {
+        givenJson("""[]""")
+        whenDecoded()
+        thenDecodeSucceedsWith(
+                ListNode(emptyList())
+        )
+    }
 
-    open inner class UnsuccessfulParse(
-            jsonText: String,
-            private val expectedPosition: Position
-    )
-    {
-        private val decoder = JacksonDecoder()
-        private val result = decoder.decode(jsonText)
+    @Test
+    fun isPopulatedArray() {
+        givenJson( """["a",1,[],{}]""")
+        whenDecoded()
+        thenDecodeSucceedsWith(
+                ListNode(
+                        listOf(
+                                "a".asNode(),
+                                1.asNode(),
+                                ListNode(emptyList()),
+                                StructNode(emptyMap())
+                        )
+                )
+        )
+    }
 
-        @Test
-        fun `then parse error captured`() {
-            assertErr(result) {
-                it.where.should.equal(expectedPosition)
-            }
-        }
+    @Test
+    fun isPopulatedStruct() {
+        givenJson(  """{"a":"a","b":1,"c":[],"d":{}}""")
+        whenDecoded()
+        thenDecodeSucceedsWith(
+                StructNode(
+                        mapOf(
+                                "a" to "a".asNode(),
+                                "b" to 1.asNode(),
+                                "c" to ListNode(emptyList()),
+                                "d" to StructNode(emptyMap())
+                        )
+                )
+        )
+    }
+
+    @Test
+    fun isEmptyString() {
+        givenJson(  "\"\"")
+        whenDecoded()
+        thenDecodeSucceedsWith("".asNode())
+    }
+
+    @Test
+    fun isPopulatedString() {
+        givenJson(  "\"a\"")
+        whenDecoded()
+        thenDecodeSucceedsWith("a".asNode())
+    }
+
+    @Test
+    fun isInteger() {
+        givenJson(  "456")
+        whenDecoded()
+        thenDecodeSucceedsWith(456.asNode())
+    }
+
+    @Test
+    fun isDouble() {
+        givenJson(  "456.890")
+        whenDecoded()
+        thenDecodeSucceedsWith(456.89.asNode())
+    }
+
+    @Test
+    fun isTrue() {
+        givenJson(  "true")
+        whenDecoded()
+        thenDecodeSucceedsWith(true.asNode())
+    }
+
+    @Test
+    fun isFalse() {
+        givenJson(  "false")
+        whenDecoded()
+        thenDecodeSucceedsWith(false.asNode())
+    }
+
+    @Test
+    fun isNull() {
+        givenJson(  "null")
+        whenDecoded()
+        thenDecodeSucceedsWith(NullNode())
+    }
+
+    @Test
+    fun isEmpty() {
+        givenJson(  "")
+        whenDecoded()
+        thenDecodeFailsWith(Position(1, 1    ))
+    }
+
+    @Test
+    fun incompleteStruct() {
+        givenJson(  "{")
+        whenDecoded()
+        thenDecodeFailsWith(Position(1, 2    ))
+    }
+
+    @Test
+    fun incompleteArray() {
+        givenJson(  "[")
+        whenDecoded()
+        thenDecodeFailsWith(Position(1, 2    ))
+    }
+
+    private lateinit var json: String
+    private lateinit var result: Result<Node, ParseError>
+
+    private fun givenJson(json: String) {this.json = json}
+
+    private fun whenDecoded() {result = JacksonDecoder().decode(json)}
+
+    private fun thenDecodeSucceedsWith(expected: Node) {
+        val actual = result.getOrElse { fail(it.toString()) }
+        assertEquals(expected, actual)
+    }
+
+    private fun thenDecodeFailsWith(expected: Position) {
+        val actual = result.getErrorOrElse { fail(it.toString()) }
+        assertEquals(expected, actual.where)
     }
 }
 

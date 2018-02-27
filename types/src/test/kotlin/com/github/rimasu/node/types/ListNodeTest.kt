@@ -20,196 +20,129 @@
  */
 package com.github.rimasu.node.types
 
-import com.winterbe.expekt.should
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
+import com.github.michaelbull.result.expect
+import com.github.michaelbull.result.expectError
+import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
+import kotlin.test.fail
 
 class ListNodeTest : NodeTest() {
 
-    private val A = "a".asNode()
-    private val B = "b".asNode()
-    private val C = "c".asNode()
+    private companion object {
+        private val A = "a".asNode()
+        private val B = "b".asNode()
+        private val C = "c".asNode()
 
-    private val EMPTY = ListNode(emptyList())
+        private val EMPTY = ListNode(emptyList())
 
-    private val ABC = ListNode(listOf(A, B, C))
+        private val ABC = ListNode(listOf(A, B, C))
+    }
 
-    override val node = EMPTY
+    override fun createNode() = ListNode(emptyList())
 
     @Test
-    fun `can iterate list`() {
-        ABC.toList().should.equal(listOf(A, B, C))
+    fun canIterateList() {
+        assertEquals(listOf(A, B, C), ABC.toList())
     }
 
     @Test
-    fun `to string contains members`() {
-        ABC.toString().should.equal("[a b c]")
+    fun toStringContainsMembers() {
+        assertEquals("[a b c]", ABC.toString())
     }
 
     @Test
-    fun `list nodes with same content are equal`() {
+    fun listNodesWithSameContentAreEqual() {
         val first = ListNode(listOf("a".asNode()))
         val second = ListNode(listOf("a".asNode()))
-        first.should.equal(second)
+        assertEquals(first, second)
     }
 
     @Test
-    fun `list nodes with same content have same hash code`() {
+    fun listNodesWithSameContentHaveSameHashCode() {
         val first = ListNode(listOf("a".asNode())).hashCode()
         val second = ListNode(listOf("a".asNode())).hashCode()
-        first.should.equal(second)
+        assertEquals(first, second)
     }
 
     @Test
-    fun `list nodes with different content are not equal`() {
+    fun listNodesWithDifferentContentAreNotEqual() {
         val first = ListNode(listOf("a".asNode()))
         val second = ListNode(listOf("b".asNode()))
-        first.should.not.equal(second)
+        assertNotEquals(first, second)
     }
 
     @Test
-    fun `list nodes with different content are not have different hash codes`() {
+    fun listNodesWithDifferentContentHaveDifferentHashCode() {
         val first = ListNode(listOf("a".asNode())).hashCode()
         val second = ListNode(listOf("b".asNode())).hashCode()
-        first.should.not.equal(second)
+        assertNotEquals(first, second)
     }
 
-    @Nested
-    inner class `when getting list node as string`  : WhenGettingNodeAsString(EMPTY) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingListNodeAsStringFails() {
+        val error = EMPTY.asString().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting list node as integer`  : WhenGettingNodeAsInt(EMPTY) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingListNodeAsIntegerFails() {
+        val error = EMPTY.asInt().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting list node as long`  : WhenGettingNodeAsLong(EMPTY) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingListNodeAsLongFails() {
+        val error = EMPTY.asLong().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting list node as float`  : WhenGettingNodeAsFloat(EMPTY) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingListNodeAsFloatFails() {
+        val error = EMPTY.asFloat().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting list node as double`  : WhenGettingNodeAsDouble(EMPTY) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingListNodeAsDoubleFails() {
+        val error = EMPTY.asDouble().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting list node as boolean`  : WhenGettingNodeAsBoolean(EMPTY) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingListNodeAsBooleanFails() {
+        val error = EMPTY.asBoolean().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting list node as struct`  : WhenGettingNodeAsStruct(EMPTY) {
-        @Test
-        fun `then result is incompatible`() = assertIncompatibleValue()
+    @Test
+    fun gettingListNodeAsListWorks() {
+        assertEquals(EMPTY, EMPTY.asList().expect { fail() })
     }
 
-    @Nested
-    inner class `when getting list node as list`  : WhenGettingNodeAsList(EMPTY) {
-
-        @Test
-        fun `then result is ok`() = assertValueRetrieved(EMPTY)
+    @Test
+    fun gettingListNodeAsStructWorks() {
+        val error = EMPTY.asStruct().expectError { fail() }
+        assertTrue(error is IncompatibleValue)
     }
 
-    @Nested
-    inner class `when getting node a index zero` {
-
-        private val result = ABC[0]
-
-        @Test
-        fun `then result is undefined value`() {
-            assertErr(result) {
-                it.should.be.instanceof(UndefinedValue::class.java)
-            }
-        }
-
-        @Test
-        fun `then result recorded index is zero`() {
-            assertErr(result) {
-                if (it is UndefinedValue) {
-                    it.path.should.equal(Path(listOf(IndexStep(0))))
-                }
-            }
-        }
+    @Test
+    fun gettingNodeAtIndexZeroFails() {
+        val error = EMPTY[0].expectError { fail() } as UndefinedValue
+        assertEquals(Path(listOf(IndexStep(0))), error.path)
     }
 
-    @Nested
-    inner class `when getting node a index one` {
-
-        private val result = ABC[1]
-
-        @Test
-        fun `then result is ok`() {
-            assertOk(result) {
-                it.should.equal(A)
-            }
-        }
+    @Test
+    fun gettingNodesAtValidIndexesWorks() {
+        assertEquals(A, ABC[1].expect { fail() })
+        assertEquals(B, ABC[2].expect { fail() })
+        assertEquals(C, ABC[3].expect { fail() })
     }
 
-
-    @Nested
-    inner class `when getting node a index two` {
-
-        private val result = ABC[2]
-
-        @Test
-        fun `then result is ok`() {
-            assertOk(result) {
-                it.should.equal(B)
-            }
-        }
+    @Test
+    fun gettingNodeAtTooHighFails() {
+        val error = EMPTY[4].expectError { fail() } as UndefinedValue
+        assertEquals(Path(listOf(IndexStep(4))), error.path)
     }
-
-
-
-    @Nested
-    inner class `when getting node a index three` {
-
-        private val result = ABC[3]
-
-        @Test
-        fun `then result is ok`() {
-            assertOk(result) {
-                it.should.equal(C)
-            }
-        }
-    }
-
-
-
-    @Nested
-    inner class `when getting node a index four` {
-
-        private val result = ABC[4]
-
-        @Test
-        fun `then result is undefined value`() {
-            assertErr(result) {
-                it.should.be.instanceof(UndefinedValue::class.java)
-            }
-        }
-
-        @Test
-        fun `then result recorded index is four`() {
-            assertErr(result) {
-                if (it is UndefinedValue) {
-                    it.path.should.equal(Path(listOf(IndexStep(4))))
-                }
-            }
-        }
-    }
-
-
 }

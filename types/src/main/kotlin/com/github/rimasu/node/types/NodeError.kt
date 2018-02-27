@@ -36,8 +36,17 @@ sealed class NodeError
  */
 data class UndefinedValue(override val path: Path, override val anchor: Region?) : NodeError()
 
-
 /**
  * Error returned when a value could not be coerced into the requested type.
  */
-class IncompatibleValue(override val path: Path, override val anchor: Region?) : NodeError()
+data class IncompatibleValue(override val path: Path, override val anchor: Region?) : NodeError()
+
+/**
+ * Error returned when a value could be coerced into expected numerical type, but its value was too low.
+ */
+data class InvalidLowValue(override val path: Path, override val anchor: Region?) : NodeError()
+
+/**
+ * Error returned when a value could be coerced into expected numerical type, but its value was too high.
+ */
+data class InvalidHighValue(override val path: Path, override val anchor: Region?) : NodeError()

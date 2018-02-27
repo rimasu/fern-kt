@@ -20,30 +20,19 @@
  */
 package com.github.rimasu.node.types
 
-import com.winterbe.expekt.should
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
+import org.junit.Test
+import kotlin.test.assertEquals
 
 class PathTest {
 
-    @Nested
-    inner class `when path is empty` {
-        private val path = Path(emptyList())
-
-        @Test
-        fun `then to string is empty braces`() {
-            path.toString().should.equal("{}")
-        }
-
-        @Test
-        fun `then steps should be empty`() {
-            path.steps.size.should.equal(0)
-        }
+    @Test
+    fun toStringOfEmptyPathIsEmptyBraces() {
+        assertEquals("{}", Path(emptyList()).toString())
     }
 
-    @Nested
-    inner class `when path has multiple steps` {
-        private val path = Path(listOf(
+    @Test
+    fun toStringOfPopulatedPathIsStepsInBraces() {
+        val path = Path(listOf(
                 LabelStep("a"),
                 LabelStep("b"),
                 IndexStep(3),
@@ -52,28 +41,19 @@ class PathTest {
                 IndexStep(7)
         ))
 
-        @Test
-        fun `then to string is steps to string in braces`() {
-            path.toString().should.equal("{/a/b#3#100/c#7}")
-        }
+        assertEquals("{/a/b#3#100/c#7}", path.toString())
     }
 
-    @Nested
-    inner class `when step added to path` {
+    @Test
+    fun canCreatePathByAddingAStepToAnExistingPath() {
+        val stepA = LabelStep("a")
+        val initial = Path(listOf(stepA))
+        val next = LabelStep("b")
+        val combined = initial + next
 
-        private val stepA = LabelStep("a")
-        private val initial = Path(listOf(stepA))
-        private val next = LabelStep("b")
-        private val combined = initial + next
+        assertEquals(Path(listOf(stepA, next)), combined)
 
-        @Test
-        fun `then combined contains all steps`() {
-            combined.should.equal(Path(listOf(stepA, next)))
-        }
-
-        @Test
-        fun `then initial path is unchanged`() {
-            initial.should.equal(Path(listOf(stepA)))
-        }
+        // initial unaffected
+        assertEquals(Path(listOf(stepA)), initial)
     }
 }

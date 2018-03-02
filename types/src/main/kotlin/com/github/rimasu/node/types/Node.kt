@@ -37,17 +37,41 @@ sealed class Node {
     /** Get the value as a string. Will return an error if the value can not be coerced into a string. */
     open fun asString(): Result<String, NodeError> = Err(IncompatibleValue(path, anchor))
 
-    /** Get the value as an integer. Will return an error if the value can not be coerced into a int. */
-    open fun asInt(): Result<Int, NodeError> =  Err(IncompatibleValue(path, anchor))
+    /** Get the value as an integer. Will return an error if the value can not be coerced into a int.
+     * @param min Optional minimum valid value for integer.
+     * @param max Optional maximum valid value for integer.
+     */
+    open fun asInt(
+            min: Int? = null,
+            max: Int? = null
+    ): Result<Int, NodeError> =  Err(IncompatibleValue(path, anchor))
 
-    /** Get the value as a long. Will return an error if the value can not be coerced into a long. */
-    open fun asLong(): Result<Long, NodeError> =  Err(IncompatibleValue(path, anchor))
+    /** Get the value as a long. Will return an error if the value can not be coerced into a long.
+     * @param min Optional minimum valid value for long.
+     * @param max Optional maximum valid value for long.
+     */
+    open fun asLong(
+            min: Long? = null,
+            max: Long? = null
+    ): Result<Long, NodeError> =  Err(IncompatibleValue(path, anchor))
 
-    /** Get the value as a float. Will return an error if the value can not be coerced into a float. */
-    open fun asFloat(): Result<Float, NodeError> = Err(IncompatibleValue(path, anchor))
+    /** Get the value as a float. Will return an error if the value can not be coerced into a float.
+     * @param min Optional minimum valid value for float.
+     * @param max Optional maximum valid value for float.
+     */
+    open fun asFloat(
+            min: Float? = null,
+            max: Float? = null
+    ): Result<Float, NodeError> = Err(IncompatibleValue(path, anchor))
 
-    /** Get the value as a double. Will return an error if the value can not be coerced into a double. */
-    open fun asDouble(): Result<Double, NodeError> = Err(IncompatibleValue(path, anchor))
+    /** Get the value as a double. Will return an error if the value can not be coerced into a double.
+     * @param min Optional minimum valid value for double.
+     * @param max Optional maximum valid value for double.
+     */
+    open fun asDouble(
+            min: Double? = null,
+            max: Double? = null
+    ): Result<Double, NodeError> = Err(IncompatibleValue(path, anchor))
 
     /** Get the value as a boolean. Will return an error if the value can not be coerced into a boolean. */
     open fun asBoolean(): Result<Boolean, NodeError> = Err(IncompatibleValue(path, anchor))
@@ -111,37 +135,53 @@ class LeafNode(private val data: String, override val anchor: Region? = null) : 
         return Ok(data)
     }
 
-    override fun asInt(): Result<Int, NodeError> {
+    override fun asInt(min: Int?, max: Int?): Result<Int, NodeError> {
         val result = data.toIntOrNull()
         return if (result != null) {
-            Ok(result)
+            when {
+                min != null && result < min -> Err(InvalidLowValue(path, anchor))
+                max != null && result > max -> Err(InvalidHighValue(path, anchor))
+                else -> Ok(result)
+            }
         } else {
             Err(IncompatibleValue(path, anchor))
         }
     }
 
-    override fun asLong(): Result<Long, NodeError> {
+    override fun asLong(min: Long?, max: Long?): Result<Long, NodeError> {
         val result = data.toLongOrNull()
         return if (result != null) {
-            Ok(result)
+            when {
+                min != null && result < min -> Err(InvalidLowValue(path, anchor))
+                max != null && result > max -> Err(InvalidHighValue(path, anchor))
+                else -> Ok(result)
+            }
         } else {
             Err(IncompatibleValue(path, anchor))
         }
     }
 
-    override fun asFloat(): Result<Float, NodeError> {
+    override fun asFloat(min: Float?, max: Float?): Result<Float, NodeError> {
         val result = data.toFloatOrNull()
         return if (result != null) {
-            Ok(result)
+            when {
+                min != null && result < min -> Err(InvalidLowValue(path, anchor))
+                max != null && result > max -> Err(InvalidHighValue(path, anchor))
+                else -> Ok(result)
+            }
         } else {
             Err(IncompatibleValue(path, anchor))
         }
     }
 
-    override fun asDouble(): Result<Double, NodeError> {
+    override fun asDouble(min: Double?, max: Double?): Result<Double, NodeError> {
         val result = data.toDoubleOrNull()
         return if (result != null) {
-            Ok(result)
+            when {
+                min != null && result < min -> Err(InvalidLowValue(path, anchor))
+                max != null && result > max -> Err(InvalidHighValue(path, anchor))
+                else -> Ok(result)
+            }
         } else {
             Err(IncompatibleValue(path, anchor))
         }

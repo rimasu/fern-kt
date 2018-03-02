@@ -20,6 +20,7 @@
  */
 package com.github.rimasu.node.types
 
+import com.github.michaelbull.result.expect
 import com.github.michaelbull.result.expectError
 import com.github.michaelbull.result.getOrElse
 import org.junit.Test
@@ -71,6 +72,30 @@ class LeafNodeTest : NodeTest() {
     }
 
     @Test
+    fun gettingIntegerLeafNodeWithMinValueFailsIfValueIsTooLow() {
+        val error = "32".asNode().asInt(min=33).expectError { fail() }
+        assertTrue(error is InvalidLowValue)
+    }
+
+    @Test
+    fun gettingIntegerLeafNodeWithMinValueWorksIfValueIsNotTooLow() {
+        val value = "33".asNode().asInt(min=33).expect{ fail() }
+        assertEquals(33, value)
+    }
+
+    @Test
+    fun gettingIntegerLeafNodeWithMaxValueFailsIfValueIsTooHigh() {
+        val error = "32".asNode().asInt(max=31).expectError { fail() }
+        assertTrue(error is InvalidHighValue)
+    }
+
+    @Test
+    fun gettingIntegerLeafNodeWithMaxValueWorksIfValueIsNotTooHigh() {
+        val value = "31".asNode().asInt(max=31).expect{ fail() }
+        assertEquals(31, value)
+    }
+
+    @Test
     fun gettingLeafNodeWithNonIntegerContentAsStringWorks() {
         assertEquals(STRING_WITH_NON_INTEGER_CONTENT, STRING_NODE.asString().getOrElse { fail() })
     }
@@ -98,6 +123,30 @@ class LeafNodeTest : NodeTest() {
     }
 
     @Test
+    fun gettingLongLeafNodeWithMinValueFailsIfValueIsTooLow() {
+        val error = "32".asNode().asLong(min=33).expectError { fail() }
+        assertTrue(error is InvalidLowValue)
+    }
+
+    @Test
+    fun gettingLongLeafNodeWithMinValueWorksIfValueIsNotTooLow() {
+        val value = "33".asNode().asLong(min=33).expect{ fail() }
+        assertEquals(33, value)
+    }
+
+    @Test
+    fun gettingLongLeafNodeWithMaxValueFailsIfValueIsTooHigh() {
+        val error = "32".asNode().asLong(max=31).expectError { fail() }
+        assertTrue(error is InvalidHighValue)
+    }
+
+    @Test
+    fun gettingLongLeafNodeWithMaxValueWorksIfValueIsNotTooHigh() {
+        val value = "31".asNode().asLong(max=31).expect{ fail() }
+        assertEquals(31, value)
+    }
+
+    @Test
     fun gettingLeafNodeWithFloatContentAsFloatWorks() {
         assertEquals(FLOAT_VALUE, FLOAT_VALUE.asNode().asFloat().getOrElse { fail() })
     }
@@ -109,6 +158,30 @@ class LeafNodeTest : NodeTest() {
     }
 
     @Test
+    fun gettingFloatLeafNodeWithMinValueFailsIfValueIsTooLow() {
+        val error = "32".asNode().asFloat(min=33.0f).expectError { fail() }
+        assertTrue(error is InvalidLowValue)
+    }
+
+    @Test
+    fun gettingFloatLeafNodeWithMinValueWorksIfValueIsNotTooLow() {
+        val value = "33".asNode().asFloat(min=33.0f).expect{ fail() }
+        assertEquals(33.0f, value)
+    }
+
+    @Test
+    fun gettingFloatLeafNodeWithMaxValueFailsIfValueIsTooHigh() {
+        val error = "32".asNode().asFloat(max=31.0f).expectError { fail() }
+        assertTrue(error is InvalidHighValue)
+    }
+
+    @Test
+    fun gettingFloatLeafNodeWithMaxValueWorksIfValueIsNotTooHigh() {
+        val value = "31".asNode().asFloat(max=31.0f).expect{ fail() }
+        assertEquals(31.0f, value)
+    }
+
+    @Test
     fun gettingLeafNodeWithDoubleContentAsDoubleWorks() {
         assertEquals(DOUBLE_VALUE, DOUBLE_VALUE.asNode().asDouble().getOrElse { fail() })
     }
@@ -117,6 +190,30 @@ class LeafNodeTest : NodeTest() {
     fun gettingLeafNodeWithNonDoubleContentAsDoubleFails() {
         val error = STRING_NODE.asDouble().expectError { fail() }
         assertTrue(error is IncompatibleValue)
+    }
+
+    @Test
+    fun gettingDoubleLeafNodeWithMinValueFailsIfValueIsTooLow() {
+        val error = "32".asNode().asDouble(min=33.0).expectError { fail() }
+        assertTrue(error is InvalidLowValue)
+    }
+
+    @Test
+    fun gettingDoubleLeafNodeWithMinValueWorksIfValueIsNotTooLow() {
+        val value = "33".asNode().asDouble(min=33.0).expect{ fail() }
+        assertEquals(33.0, value)
+    }
+
+    @Test
+    fun gettingDoubleLeafNodeWithMaxValueFailsIfValueIsTooHigh() {
+        val error = "32".asNode().asDouble(max=31.0).expectError { fail() }
+        assertTrue(error is InvalidHighValue)
+    }
+
+    @Test
+    fun gettingDoubleLeafNodeWithMaxValueWorksIfValueIsNotTooHigh() {
+        val value = "31".asNode().asDouble(max=31.0).expect{ fail() }
+        assertEquals(31.0, value)
     }
 
     @Test

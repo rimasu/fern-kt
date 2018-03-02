@@ -20,6 +20,16 @@
  */
 package com.github.rimasu.node.decoder
 
+import com.github.rimasu.node.decoder.CodePointType.*
+import com.github.rimasu.node.decoder.CodePointType.Companion.CLOSE_PARENTHESIS_CODE_POINT
+import com.github.rimasu.node.decoder.CodePointType.Companion.CLOSE_SQUARE_BRACKETS_CODE_POINT
+import com.github.rimasu.node.decoder.CodePointType.Companion.DOUBLE_QUOTE_CODE_POINT
+import com.github.rimasu.node.decoder.CodePointType.Companion.EQUALS_CODE_POINT
+import com.github.rimasu.node.decoder.CodePointType.Companion.LINE_FEED
+import com.github.rimasu.node.decoder.CodePointType.Companion.OPEN_PARENTHESIS_CODE_POINT
+import com.github.rimasu.node.decoder.CodePointType.Companion.OPEN_SQUARE_BRACKETS_CODE_POINT
+import com.github.rimasu.node.decoder.CodePointType.Companion.PIPE_CODE_POINT
+import com.github.rimasu.node.decoder.CodePointType.Companion.classify
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -27,96 +37,96 @@ class CodePointTypeTest {
 
     @Test
     fun openParenthesisClassifiedAsOpenStruct() {
-        assertEquals(CodePointType.OPEN_STRUCT, CodePointType.classify(CodePointType.OPEN_PARENTHESIS_CODE_POINT))
+        assertEquals(OPEN_STRUCT, classify(OPEN_PARENTHESIS_CODE_POINT))
     }
 
     @Test
     fun closeParenthesisClassifiedAsCloseStruct() {
-        assertEquals(CodePointType.CLOSE_STRUCT, CodePointType.classify(CodePointType.CLOSE_PARENTHESIS_CODE_POINT))
+        assertEquals(CLOSE_STRUCT, classify(CLOSE_PARENTHESIS_CODE_POINT))
     }
 
     @Test
     fun openSquareBracketsClassifiedAsOpenList() {
-        assertEquals(CodePointType.OPEN_LIST, CodePointType.classify(CodePointType.OPEN_SQUARE_BRACKETS_CODE_POINT))
+        assertEquals(OPEN_LIST, classify(OPEN_SQUARE_BRACKETS_CODE_POINT))
     }
 
     @Test
     fun closeSquareBracketsClassifiedAsCloseList() {
-        assertEquals(CodePointType.CLOSE_LIST, CodePointType.classify(CodePointType.CLOSE_SQUARE_BRACKETS_CODE_POINT))
+        assertEquals(CLOSE_LIST, classify(CLOSE_SQUARE_BRACKETS_CODE_POINT))
     }
 
     @Test
     fun equalsClassifiedAsAssignment() {
-        assertEquals(CodePointType.ASSIGNMENT, CodePointType.classify(CodePointType.EQUALS_CODE_POINT))
+        assertEquals(ASSIGNMENT, classify(EQUALS_CODE_POINT))
     }
 
     @Test
     fun doubleQuoteClassifiedAsQuote() {
-        assertEquals(CodePointType.QUOTE, CodePointType.classify(CodePointType.DOUBLE_QUOTE_CODE_POINT))
+        assertEquals(QUOTE, classify(DOUBLE_QUOTE_CODE_POINT))
     }
 
     @Test
     fun pipeClassifiedAsEscape() {
-        assertEquals(CodePointType.ESCAPE, CodePointType.classify(CodePointType.PIPE_CODE_POINT))
+        assertEquals(ESCAPE, classify(PIPE_CODE_POINT))
     }
 
     @Test
     fun spaceClassifiedAsWhiteSpace() {
-        assertEquals(CodePointType.WHITE_SPACE, CodePointType.classify(' '.toInt()))
+        assertEquals(WHITE_SPACE, classify(' '.toInt()))
     }
 
     @Test
     fun tabClassifiedAsWhiteSpace() {
-        assertEquals(CodePointType.WHITE_SPACE, CodePointType.classify('\t'.toInt()))
+        assertEquals(WHITE_SPACE, classify('\t'.toInt()))
     }
 
     @Test
     fun lineFeedClassifiedAsWhiteSpace() {
-        assertEquals(CodePointType.WHITE_SPACE, CodePointType.classify(CodePointType.LINE_FEED))
+        assertEquals(WHITE_SPACE, classify(LINE_FEED))
     }
 
     @Test
     fun verticalTabClassifiedAsWhiteSpace() {
-        assertEquals(CodePointType.WHITE_SPACE, CodePointType.classify(0x0B))
+        assertEquals(WHITE_SPACE, classify(0x0B))
     }
 
     @Test
     fun formFeedTabClassifiedAsWhiteSpace() {
-        assertEquals(CodePointType.WHITE_SPACE, CodePointType.classify(0x0C))
+        assertEquals(WHITE_SPACE, classify(0x0C))
     }
 
     @Test
     fun carriageReturnClassifiedAsWhiteSpace() {
-        assertEquals(CodePointType.WHITE_SPACE, CodePointType.classify('\r'.toInt()))
+        assertEquals(WHITE_SPACE, classify('\r'.toInt()))
     }
 
     @Test
     fun fileSeparatorTabClassifiedAsWhiteSpace() {
-        assertEquals(CodePointType.WHITE_SPACE, CodePointType.classify(0x1C))
+        assertEquals(WHITE_SPACE, classify(0x1C))
     }
 
     @Test
     fun groupSeparatorTabClassifiedAsWhiteSpace() {
-        assertEquals(CodePointType.WHITE_SPACE, CodePointType.classify(0x1D))
+        assertEquals(WHITE_SPACE, classify(0x1D))
     }
 
     @Test
     fun recordSeparatorTabClassifiedAsWhiteSpace() {
-        assertEquals(CodePointType.WHITE_SPACE, CodePointType.classify(0x1E))
+        assertEquals(WHITE_SPACE, classify(0x1E))
     }
 
     @Test
     fun unitSeparatorTabClassifiedAsWhiteSpace() {
-        assertEquals(CodePointType.WHITE_SPACE, CodePointType.classify(0x1F))
+        assertEquals(WHITE_SPACE, classify(0x1F))
     }
 
     @Test
     fun aClassifiedAsNormal() {
-        assertEquals(CodePointType.NORMAL, CodePointType.classify('a'.toInt()))
+        assertEquals(NORMAL, classify('a'.toInt()))
     }
 
     @Test
     fun maxUnicodeChareClassifiedAsNormal() {
-        assertEquals(CodePointType.NORMAL, CodePointType.classify(0x10FFFF))
+        assertEquals(NORMAL, classify(0x10FFFF))
     }
 }

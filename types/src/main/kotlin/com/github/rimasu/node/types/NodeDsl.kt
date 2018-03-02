@@ -18,14 +18,12 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-package com.github.rimasu.node.decoder
+package com.github.rimasu.node.types
 
-import com.github.rimasu.node.types.ListNode
-import com.github.rimasu.node.types.Node
-import com.github.rimasu.node.types.StructNode
-import com.github.rimasu.node.types.asNode
+@DslMarker
+annotation class NodeDslMarker
 
-
+@NodeDslMarker
 interface ListNodeContent {
     fun add(data: Node)
 
@@ -34,6 +32,7 @@ interface ListNodeContent {
     }
 }
 
+@NodeDslMarker
 interface StructNodeContent {
     fun add(label: String, data: Node)
 
@@ -42,7 +41,27 @@ interface StructNodeContent {
     }
 }
 
-internal class ListNodeBuilder : ListNodeContent {
+/**
+ * Create a list node using Node DSL.
+ */
+@NodeDslMarker
+fun listNode(init: ListNodeContent.() -> Unit) : Node {
+    val bld = ListNodeBuilder()
+    bld.init()
+    return bld.build()
+}
+
+/**
+ * Create a struct node using Node DSL.
+ */
+@NodeDslMarker
+fun structNode(init: StructNodeContent.() -> Unit) : Node {
+    val bld = StructNodeBuilder()
+    bld.init()
+    return bld.build()
+}
+
+private class ListNodeBuilder : ListNodeContent {
 
     private val nodes = mutableListOf<Node>()
 
@@ -55,7 +74,7 @@ internal class ListNodeBuilder : ListNodeContent {
     }
 }
 
-internal class StructNodeBuilder : StructNodeContent {
+private class StructNodeBuilder : StructNodeContent {
 
     private val nodes = mutableMapOf<String, Node>()
 
@@ -68,16 +87,3 @@ internal class StructNodeBuilder : StructNodeContent {
     }
 }
 
-
-
-fun listNode(init: ListNodeContent.() -> Unit) : Node {
-    val bld = ListNodeBuilder()
-    bld.init()
-    return bld.build()
-}
-
-fun structNode(init: StructNodeContent.() -> Unit) : Node {
-    val bld = StructNodeBuilder()
-    bld.init()
-    return bld.build()
-}

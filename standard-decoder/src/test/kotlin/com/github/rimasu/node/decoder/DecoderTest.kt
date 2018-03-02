@@ -22,10 +22,7 @@ package com.github.rimasu.node.decoder
 
 import com.github.michaelbull.result.*
 import com.github.rimasu.node.decoder.CodePointType.*
-import com.github.rimasu.node.types.ListNode
-import com.github.rimasu.node.types.Node
-import com.github.rimasu.node.types.StructNode
-import com.github.rimasu.node.types.asNode
+import com.github.rimasu.node.types.*
 import com.github.rimasu.text.Position
 import com.github.rimasu.text.Region
 import org.junit.Test

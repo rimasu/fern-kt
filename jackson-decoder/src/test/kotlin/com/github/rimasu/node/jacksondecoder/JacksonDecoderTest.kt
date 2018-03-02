@@ -37,7 +37,7 @@ class JacksonDecoderTest {
         givenJson("""{}""")
         whenDecoded()
         thenDecodeSucceedsWith(
-                StructNode(emptyMap())
+                structNode {}
         )
     }
 
@@ -46,7 +46,7 @@ class JacksonDecoderTest {
         givenJson("""[]""")
         whenDecoded()
         thenDecodeSucceedsWith(
-                ListNode(emptyList())
+                listNode {}
         )
     }
 
@@ -55,14 +55,12 @@ class JacksonDecoderTest {
         givenJson( """["a",1,[],{}]""")
         whenDecoded()
         thenDecodeSucceedsWith(
-                ListNode(
-                        listOf(
-                                "a".asNode(),
-                                1.asNode(),
-                                ListNode(emptyList()),
-                                StructNode(emptyMap())
-                        )
-                )
+                listNode {
+                    add("a")
+                    add("1")
+                    add(listNode {})
+                    add(structNode {})
+                }
         )
     }
 
@@ -71,14 +69,12 @@ class JacksonDecoderTest {
         givenJson(  """{"a":"a","b":1,"c":[],"d":{}}""")
         whenDecoded()
         thenDecodeSucceedsWith(
-                StructNode(
-                        mapOf(
-                                "a" to "a".asNode(),
-                                "b" to 1.asNode(),
-                                "c" to ListNode(emptyList()),
-                                "d" to StructNode(emptyMap())
-                        )
-                )
+                structNode {
+                    add("a", "a")
+                    add("b", "1")
+                    add("c", listNode {})
+                    add("d", structNode {})
+                }
         )
     }
 

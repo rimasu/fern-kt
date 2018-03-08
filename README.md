@@ -1,13 +1,11 @@
 # Friendly Resource Notation (FERN)
-A generic, generic structured, weakly typed value exchange stucture.
+A generic, generic structured, weakly typed value exchange structure.
 
 [![Build Status](https://travis-ci.org/rimasu/fern-kt.png?branch=master)](https://travis-ci.org/rimasu/node)
 
 This projects has three main components
-1. A generic weakly typed tree structure, designed to support easy
-configuration of application components.
-2. A standard decoder that can read a the very simple and
-flexible FERN
+1. A types that contains the format independent, tree structure
+2. A standard decoder that can read FERN (see below for examples)
 3. A jackson decoder that can read convention JSON
 
 License: MIT
@@ -37,11 +35,42 @@ location can be retrieved from results error information
 The basic types are all implemented in the 'types' sub-model.
 
 1) Node: Sealed class that defines the interface for nodes.
-
 2) Null Node: A empty node.
-
 3) Leaf Node: Stores small data types. Internally all types are stored as strings
-
 4) List Node: Stores a ordered list of nodes. First node is at index one.
-
 5) Struct Node: Stores a structured set of nodes, identified by labels.
+
+## FERN Examples
+
+A simple structure with properties. Strings only need quotes if they 
+contain whitespace.
+```lisp
+(
+    a = 12
+    b = hello
+    c = "string with whitespace"
+)
+```
+
+White space is insignificant. The following snippet is entirely equivalent
+to the preceeding one.
+```lisp
+(a=12 b =hello c= "string with whitespace")
+```
+
+A list can contain any mix things. Commas are not used.
+```lisp
+[ item1   12 "another thing"]
+```
+
+A more complex demonstrates that both structures and list can 
+contain nested structures and lists.
+```lisp
+(
+    a = (
+        c = 2
+        d = [1 3 4]
+    )
+    b = [(a=12 b=3) [1 2] ]
+)
+```

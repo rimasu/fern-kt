@@ -1,4 +1,4 @@
-rootProject.name="node"
+rootProject.name="fern"
 
 include "types"
 include "jackson-decoder"

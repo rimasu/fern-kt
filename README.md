@@ -1,8 +1,18 @@
-# Node, generic structured, weakly typed value exchange stucture.
+# Friendly Resource Notation (FERN)
+A generic, generic structured, weakly typed value exchange stucture.
 
 [![Build Status](https://travis-ci.org/rimasu/fern-kt.png?branch=master)](https://travis-ci.org/rimasu/node)
 
+This projects has three main components
+1. A generic weakly typed tree structure, designed to support easy
+configuration of application components.
+2. A standard decoder that can read a the very simple and
+flexible FERN
+3. A jackson decoder that can read convention JSON
+
 License: MIT
+
+## Generic Types
 
 This library provides a small number of node types that can be composed to represent
 rich configuration and control data.  It provides similar functionality to a
@@ -23,8 +33,6 @@ equivalent to "true"). The also opens the potential for very simple storage form
 code, as it requires an object creation for each data access.  However for configuration
 and control code it is ideal because when a expected value is missing its precise
 location can be retrieved from results error information
-
-# Basic Types
 
 The basic types are all implemented in the 'types' sub-model.
 

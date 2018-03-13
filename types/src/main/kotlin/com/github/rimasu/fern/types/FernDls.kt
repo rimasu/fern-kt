@@ -21,45 +21,74 @@
 package com.github.rimasu.fern.types
 
 @DslMarker
-annotation class NodeDslMarker
+annotation class FernDslMarker
 
-@NodeDslMarker
+@FernDslMarker
 interface ListNodeContent {
     fun add(data: Node)
 
     fun add(data: String) {
         add(data.asNode())
     }
+
+    fun list(init: ListNodeContent.() -> Unit) {
+        val bld = ListNodeBuilder()
+        bld.init()
+        add(bld.build())
+    }
+
+    fun struct(init: StructNodeContent.() -> Unit) {
+        val bld = StructNodeBuilder()
+        bld.init()
+        add( bld.build())
+    }
 }
 
-@NodeDslMarker
+@FernDslMarker
 interface StructNodeContent {
     fun add(label: String, data: Node)
 
     fun add(label: String, data: String) {
         add(label, data.asNode())
     }
+
+    fun list(label: String, init: ListNodeContent.() -> Unit) {
+        val bld = ListNodeBuilder()
+        bld.init()
+        add(label, bld.build())
+    }
+
+    fun struct(label: String, init: StructNodeContent.() -> Unit) {
+        val bld = StructNodeBuilder()
+        bld.init()
+        add(label, bld.build())
+    }
 }
 
-/**
- * Create a list node using Node DSL.
- */
-@NodeDslMarker
-fun listNode(init: ListNodeContent.() -> Unit) : Node {
-    val bld = ListNodeBuilder()
-    bld.init()
-    return bld.build()
+
+object Fern
+{
+    /**
+     * Create a list node using Node DSL.
+     */
+    @FernDslMarker
+    fun list(init: ListNodeContent.() -> Unit) : Node {
+        val bld = ListNodeBuilder()
+        bld.init()
+        return bld.build()
+    }
+
+    /**
+     * Create a struct node using Node DSL.
+     */
+    @FernDslMarker
+    fun struct(init: StructNodeContent.() -> Unit) : Node {
+        val bld = StructNodeBuilder()
+        bld.init()
+        return bld.build()
+    }
 }
 
-/**
- * Create a struct node using Node DSL.
- */
-@NodeDslMarker
-fun structNode(init: StructNodeContent.() -> Unit) : Node {
-    val bld = StructNodeBuilder()
-    bld.init()
-    return bld.build()
-}
 
 private class ListNodeBuilder : ListNodeContent {
 

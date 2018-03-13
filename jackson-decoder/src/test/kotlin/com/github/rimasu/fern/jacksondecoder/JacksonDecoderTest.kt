@@ -24,6 +24,8 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.getErrorOrElse
 import com.github.michaelbull.result.getOrElse
 import com.github.rimasu.fern.types.*
+import com.github.rimasu.fern.types.Fern.list
+import com.github.rimasu.fern.types.Fern.struct
 import com.github.rimasu.text.Position
 import org.junit.Test
 
@@ -36,18 +38,14 @@ class JacksonDecoderTest {
     fun isEmptyStruct() {
         givenJson("""{}""")
         whenDecoded()
-        thenDecodeSucceedsWith(
-                structNode {}
-        )
+        thenDecodeSucceedsWith(struct {})
     }
 
     @Test
     fun isEmptyArray() {
         givenJson("""[]""")
         whenDecoded()
-        thenDecodeSucceedsWith(
-                listNode {}
-        )
+        thenDecodeSucceedsWith(list {})
     }
 
     @Test
@@ -55,11 +53,11 @@ class JacksonDecoderTest {
         givenJson( """["a",1,[],{}]""")
         whenDecoded()
         thenDecodeSucceedsWith(
-                listNode {
+                list {
                     add("a")
                     add("1")
-                    add(listNode {})
-                    add(structNode {})
+                    list {}
+                    struct {}
                 }
         )
     }
@@ -69,11 +67,11 @@ class JacksonDecoderTest {
         givenJson(  """{"a":"a","b":1,"c":[],"d":{}}""")
         whenDecoded()
         thenDecodeSucceedsWith(
-                structNode {
+                struct {
                     add("a", "a")
                     add("b", "1")
-                    add("c", listNode {})
-                    add("d", structNode {})
+                    list("c") {}
+                    struct("d") {}
                 }
         )
     }

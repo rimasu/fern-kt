@@ -20,14 +20,16 @@
  */
 package com.github.rimasu.fern.types
 
+import com.github.rimasu.fern.types.Fern.list
+import com.github.rimasu.fern.types.Fern.struct
 import org.junit.Test
 import kotlin.test.assertEquals
 
 class NodeDslTest {
 
     @Test
-    fun canCreateStructNode() {
-        val value = structNode {
+    fun canCreateTopLevelStructNode() {
+        val value = struct {
             add("a", "b")
         }
 
@@ -41,14 +43,102 @@ class NodeDslTest {
     }
 
     @Test
-    fun canCreateListNode() {
-        val value = listNode {
+    fun canCreateStructInStruct() {
+        val value = struct {
+            struct("a") {
+                add("a", "b")
+            }
+        }
+
+        assertEquals(
+                StructNode(
+                        mapOf(
+                                "a" to StructNode(
+                                        mapOf(
+                                                "a" to "b".asNode()
+                                        )
+                                )
+                        )
+                )
+                , value
+        )
+    }
+
+    @Test
+    fun canCreateListInStruct() {
+        val value = struct {
+            list("a") {
+                add("a")
+            }
+        }
+
+        assertEquals(
+                StructNode(
+                        mapOf(
+                                "a" to ListNode(
+                                        listOf(
+                                                "a".asNode()
+                                        )
+                                )
+                        )
+                )
+                , value
+        )
+    }
+
+    @Test
+    fun canCreateTopLevelListNode() {
+        val value = list {
             add("b")
         }
 
         assertEquals(
                 ListNode(listOf("b".asNode())),
                 value
+        )
+    }
+
+    @Test
+    fun canCreateStructInAList() {
+        val value = list {
+            struct {
+                add("a", "b")
+            }
+        }
+
+        assertEquals(
+                ListNode(
+                        listOf(
+                                StructNode(
+                                        mapOf(
+                                                "a" to "b".asNode()
+                                        )
+                                )
+                        )
+                )
+                , value
+        )
+    }
+
+    @Test
+    fun canCreateListInAList() {
+        val value = list {
+            list {
+                add("a")
+            }
+        }
+
+        assertEquals(
+                ListNode(
+                        listOf(
+                                ListNode(
+                                        listOf(
+                                                "a".asNode()
+                                        )
+                                )
+                        )
+                )
+                , value
         )
     }
 }

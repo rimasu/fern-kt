@@ -23,6 +23,8 @@ package com.github.rimasu.fern.decoder
 import com.github.michaelbull.result.*
 import com.github.rimasu.fern.decoder.CodePointType.*
 import com.github.rimasu.fern.types.*
+import com.github.rimasu.fern.types.Fern.list
+import com.github.rimasu.fern.types.Fern.struct
 import com.github.rimasu.text.Position
 import com.github.rimasu.text.Region
 import org.junit.Test
@@ -61,7 +63,7 @@ class DecoderTest {
         givenText("[]")
         whenDecoded()
         checkNode { value ->
-            assertEquals(listNode {}, value)
+            assertEquals(list {}, value)
             assertEquals(Region(1, 1, 1, 2), value.anchor)
         }
     }
@@ -71,7 +73,7 @@ class DecoderTest {
         givenText("\n []")
         whenDecoded()
         checkNode { value ->
-            assertEquals(listNode {}, value)
+            assertEquals(list {}, value)
             assertEquals(Region(2, 2, 2, 3), value.anchor)
         }
     }
@@ -81,7 +83,7 @@ class DecoderTest {
         givenText("[\n ]")
         whenDecoded()
         checkNode { value ->
-            assertEquals(listNode {}, value)
+            assertEquals(list {}, value)
             assertEquals(Region(1, 1, 2, 2), value.anchor)
         }
     }
@@ -91,7 +93,7 @@ class DecoderTest {
         givenText("[abcd]")
         whenDecoded()
         checkNode { value ->
-            assertEquals(listNode { add("abcd") }, value)
+            assertEquals(list { add("abcd") }, value)
             assertEquals(Region(1, 1, 1, 6), value.anchor)
         }
 
@@ -110,7 +112,7 @@ class DecoderTest {
         whenDecoded()
 
         checkNode { value ->
-            assertEquals(listNode { add("abcd"); add("efgh") }, value)
+            assertEquals(list { add("abcd"); add("efgh") }, value)
             assertEquals(Region(1, 1, 1, 11), value.anchor)
         }
 
@@ -133,7 +135,7 @@ class DecoderTest {
         givenText("[\"abcd\"]")
         whenDecoded()
         checkNode { value ->
-            assertEquals(listNode { add("abcd".asNode()) }, value)
+            assertEquals(list { add("abcd".asNode()) }, value)
             assertEquals(Region(1, 1, 1, 8), value.anchor)
 
             value as ListNode
@@ -149,7 +151,7 @@ class DecoderTest {
         givenText("[\"ab|\"cd\"]")
         whenDecoded()
         checkNode { value ->
-            assertEquals(listNode { add("ab\"cd") }, value)
+            assertEquals(list { add("ab\"cd") }, value)
             assertEquals(Region(1, 1, 1, 10), value.anchor)
             value as ListNode
             with(value[1].getOrElse { fail(it.toString()) }) {
@@ -164,7 +166,7 @@ class DecoderTest {
         givenText("[\"abcd\" \"efgh\"]")
         whenDecoded()
         checkNode { value ->
-            assertEquals(listNode { add("abcd"); add("efgh") }, value)
+            assertEquals(list { add("abcd"); add("efgh") }, value)
             assertEquals(Region(1, 1, 1, 15), value.anchor)
             value as ListNode
             with(value[1].getOrElse { fail(it.toString()) }) {
@@ -183,11 +185,11 @@ class DecoderTest {
         givenText("[[]]")
         whenDecoded()
         checkNode { value ->
-            assertEquals(listNode { add(listNode {}) }, value)
+            assertEquals(list { list {} }, value)
             assertEquals(Region(1, 1, 1, 4), value.anchor)
             value as ListNode
             with(value[1].getOrElse { fail(it.toString()) }) {
-                assertEquals(listNode {}, this)
+                assertEquals(list {}, this)
                 assertEquals(Region(1, 2, 1, 3), this.anchor)
             }
         }
@@ -198,11 +200,11 @@ class DecoderTest {
         givenText("[()]")
         whenDecoded()
         checkNode { value ->
-            assertEquals(listNode { add(structNode {}) }, value)
+            assertEquals(list { struct {} }, value)
             assertEquals(Region(1, 1, 1, 4), value.anchor)
             value as ListNode
             with(value[1].getOrElse { fail(it.toString()) }) {
-                assertEquals(structNode {}, this)
+                assertEquals(struct {}, this)
                 assertEquals(Region(1, 2, 1, 3), this.anchor)
             }
         }
@@ -213,7 +215,7 @@ class DecoderTest {
         givenText("()")
         whenDecoded()
         checkNode { value ->
-            assertEquals(structNode {}, value)
+            assertEquals(struct {}, value)
             assertEquals(Region(1, 1, 1, 2), value.anchor)
         }
     }
@@ -223,7 +225,7 @@ class DecoderTest {
         givenText("\n ()")
         whenDecoded()
         checkNode { value ->
-            assertEquals(structNode {}, value)
+            assertEquals(struct {}, value)
             assertEquals(Region(2, 2, 2, 3), value.anchor)
         }
     }
@@ -233,7 +235,7 @@ class DecoderTest {
         givenText("(\n )")
         whenDecoded()
         checkNode { value ->
-            assertEquals(structNode {}, value)
+            assertEquals(struct {}, value)
             assertEquals(Region(1, 1, 2, 2), value.anchor)
         }
     }
@@ -243,7 +245,7 @@ class DecoderTest {
         givenText("(a=1 b =2 c  =3 d= 4 e=  5)")
         whenDecoded()
         checkNode { value ->
-            assertEquals(structNode {
+            assertEquals(struct {
                 add("a", "1")
                 add("b", "2")
                 add("c", "3")
@@ -285,7 +287,7 @@ class DecoderTest {
         givenText("(a=\"1 \" b =\" 2\" )")
         whenDecoded()
         checkNode { value ->
-            assertEquals(structNode {
+            assertEquals(struct {
                 add("a", "1 ")
                 add("b", " 2")
             }, value)
@@ -309,14 +311,14 @@ class DecoderTest {
         givenText("(a=() )")
         whenDecoded()
         checkNode { value ->
-            assertEquals(structNode {
-                add("a", structNode {})
+            assertEquals(struct {
+                add("a", struct {})
             }, value)
             assertEquals(Region(1, 1, 1, 7), value.anchor)
 
             value as StructNode
             with(value["a"].getOrElse { fail(it.toString()) }) {
-                assertEquals(structNode {}, this)
+                assertEquals(struct {}, this)
                 assertEquals(Region(1, 4, 1, 5), this.anchor)
             }
 
@@ -328,14 +330,14 @@ class DecoderTest {
         givenText("(a=[] )")
         whenDecoded()
         checkNode { value ->
-            assertEquals(structNode {
-                add("a", listNode {})
+            assertEquals(struct {
+                list("a") {}
             }, value)
             assertEquals(Region(1, 1, 1, 7), value.anchor)
 
             value as StructNode
             with(value["a"].getOrElse { fail(it.toString()) }) {
-                assertEquals(listNode {}, this)
+                assertEquals(list {}, this)
                 assertEquals(Region(1, 4, 1, 5), this.anchor)
             }
         }
